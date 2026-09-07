@@ -2841,13 +2841,11 @@ app.get("/api/health", async (request, response, next) => {
     } catch (error) {
         next(error);
     }
-});
 
-app.get("*", async (request, response, next) => {
     if (request.path.startsWith("/api/")) {
         return next();
     }
-
+app.get("/{*splat}", async (request, response, next) => {
     try {
         const indexPath = path.join(__dirname, "public", "index.html");
         return response.send(await fs.readFile(indexPath, "utf8"));
