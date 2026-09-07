@@ -1,0 +1,22 @@
+{
+    "name": "super-clean-app",
+    "version": "0.2.0",
+    "private": true,
+    "description": "Super Clean Banja Luka web aplikacija",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "node --watch server.js"
+    },
+    "engines": {
+        "node": ">=20"
+    },
+    "dependencies": {
+        "bcryptjs": "^3.0.2",
+        "express": "^5.1.0",
+        "express-rate-limit": "^8.0.1",
+        "helmet": "^8.1.0",
+        "pg": "^8.16.3",
+        "qrcode": "^1.5.4"
+    }
+}

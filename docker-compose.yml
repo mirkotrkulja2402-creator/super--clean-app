@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:17
+    container_name: super-clean-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: superclean
+      POSTGRES_USER: superclean
+      POSTGRES_PASSWORD: change-this-password
+    ports:
+      - "5432:5432"
+    volumes:
+      - super_clean_pgdata:/var/lib/postgresql/data
+
+volumes:
+  super_clean_pgdata:
