@@ -2845,8 +2845,7 @@ app.get("/api/health", async (request, response, next) => {
     if (request.path.startsWith("/api/")) {
         return next();
     }
-app.get("/{*splat}", async (request, response, next) => {
-    try {
+app.get("/{*splat}", async (request, response, next) => { 
         const indexPath = path.join(__dirname, "public", "index.html");
         return response.send(await fs.readFile(indexPath, "utf8"));
     } catch (error) {
