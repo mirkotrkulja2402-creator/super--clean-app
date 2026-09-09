@@ -165,13 +165,13 @@ ON CONFLICT DO NOTHING;
 CREATE TABLE IF NOT EXISTS orders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_number BIGSERIAL UNIQUE,
-    customer_id UUID NOT NULL REFERENCES customers(id) ON RESTRICT,
+    customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE RESTRICT,
     order_date DATE NOT NULL DEFAULT CURRENT_DATE,
     status VARCHAR(30) NOT NULL DEFAULT 'RECEIVED'
         CHECK (status IN ('RECEIVED', 'WASHING', 'DRYING', 'READY', 'DELIVERED', 'PAID', 'CANCELLED')),
     note TEXT NOT NULL DEFAULT '',
     delivery_price NUMERIC(12, 2) NOT NULL DEFAULT 0,
-    created_by UUID REFERENCES users(id) ON SET NULL,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -220,7 +220,7 @@ CREATE TABLE IF NOT EXISTS invoices (
     issued_at DATE NOT NULL DEFAULT CURRENT_DATE,
     due_date DATE,
     cancelled_at TIMESTAMPTZ,
-    created_by UUID REFERENCES users(id) ON SET NULL,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
