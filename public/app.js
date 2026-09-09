@@ -1859,11 +1859,22 @@ function openModal(html) {
     }
 
     const itemFormElement = root.querySelector("#order-item-form");
-    if (itemFormElement) {
+        if (itemFormElement) {
         bindOrderItemCalculation();
         itemFormElement.addEventListener("submit", handleOrderItemSubmit);
     }
+
+    const userFormElement = root.querySelector("#user-form");
+    if (userFormElement) {
+        userFormElement.addEventListener("submit", handleUserSubmit);
+    }
+
+    const roleFormElement = root.querySelector("#role-form");
+    if (roleFormElement) {
+        roleFormElement.addEventListener("submit", handleRoleSubmit);
+    }
 }
+
 
 function bindUserActions() {
     document.getElementById("add-user")?.addEventListener("click", () => openModal(userForm()));
