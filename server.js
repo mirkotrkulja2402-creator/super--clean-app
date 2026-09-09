@@ -786,6 +786,8 @@ function normalizeOrderInput(body) {
     return {
         customerId: String(body.customerId || "").trim(),
         orderDate: String(body.orderDate || "").trim(),
+        pickupTimeFrom: String(body.pickupTimeFrom || "").trim(),
+        pickupTimeTo: String(body.pickupTimeTo || "").trim(),
         note: String(body.note || "").trim(),
         status: String(body.status || "RECEIVED").trim().toUpperCase(),
     };
@@ -851,6 +853,10 @@ function publicOrder(row) {
         latitude: row.latitude === null ? null : Number(row.latitude),
         longitude: row.longitude === null ? null : Number(row.longitude),
         orderDate: row.order_date,
+        plannedPickupDate: row.planned_pickup_date || row.order_date,
+        pickupTimeFrom: row.pickup_time_from || null,
+        pickupTimeTo: row.pickup_time_to || null,
+        actualPickupAt: row.actual_pickup_at || null,
         status: row.status,
         note: row.note,
         deliveryPrice: Number(row.delivery_price || 0),
@@ -1508,11 +1514,40 @@ app.post("/api/orders", authenticate, requirePermission("orders.create"), async 
         }
 
         const result = await pool.query(
-            `INSERT INTO orders (customer_id, order_date, status, note, created_by)
-             VALUES ($1, COALESCE(NULLIF($2, '')::date, CURRENT_DATE), $3, $4, $5)
-             RETURNING id, order_number, customer_id, order_date, status, note, created_at, updated_at`,
-            [input.customerId, input.orderDate, input.status, input.note, request.user.id],
+            `INSERT INTO orders
+                 (customer_id, order_date, planned_pickup_date, pickup_time_from, pickup_time_to,
+                  status, note, created_by)
+             VALUES ($1, COALESCE(NULLIF($2, '')::date, CURRENT_DATE),
+                     COALESCE(NULLIF($2, '')::date, CURRENT_DATE),
+                     NULLIF($3, '')::time, NULLIF($4, '')::time,
+                     $5, $6, $7)
+             RETURNING id, order_number, customer_id, order_date, planned_pickup_date,
+                       pickup_time_from, pickup_time_to, status, note, created_at, updated_at`,
+            [
+                input.customerId,
+                input.orderDate,
+                input.pickupTimeFrom,
+                input.pickupTimeTo,
+                input.status,
+                input.note,
+                request.user.id,
+            ],
         );
+
+        await pool.query(
+            `INSERT INTO route_jobs
+                (source_type, source_id, action_type, latitude, longitude)
+             SELECT 'ORDER', o.id, 'PICKUP', c.latitude, c.longitude
+             FROM orders o
+             JOIN customers c ON c.id = o.customer_id
+             WHERE o.id = $1
+             ON CONFLICT (source_type, source_id, action_type)
+             DO UPDATE SET latitude = EXCLUDED.latitude, longitude = EXCLUDED.longitude,
+                           updated_at = NOW()`,
+            [result.rows[0].id],
+        );
+
+        await ensurePickupRouteJob(result.rows[0].id);
 
         const detail = await pool.query(
             `SELECT o.id, o.order_number, o.customer_id,
@@ -1885,13 +1920,32 @@ app.post("/api/invoices", authenticate, requirePermission("invoices.create"), as
         }
 
         const itemsResult = await client.query(
-            `SELECT id FROM order_items WHERE order_id = $1 LIMIT 1`,
+            `SELECT id, unit, length_m, width_m, area_m2, measured_at_pickup
+             FROM order_items
+             WHERE order_id = $1
+             ORDER BY created_at, id`,
             [orderId],
         );
 
-        if (itemsResult.rowCount !== 1) {
+        if (itemsResult.rowCount === 0) {
             await client.query("ROLLBACK");
-            return response.status(400).json({ error: "Račun se ne može snimiti bez izmjerenih stavki." });
+            return response.status(400).json({ error: "Račun se ne može snimiti bez stavki." });
+        }
+
+        const incompleteItem = itemsResult.rows.find((item) => {
+            if (item.unit !== "m2") return false;
+            const dimensionsValid = Number(item.length_m) > 0 &&
+                Number(item.width_m) > 0 &&
+                Number(item.area_m2) > 0;
+            return !item.measured_at_pickup && !dimensionsValid;
+        });
+
+        if (incompleteItem) {
+            await client.query("ROLLBACK");
+            return response.status(400).json({
+                error: "Račun se ne može završiti dok svaki tepih nema dimenzije ili oznaku „Izmjeren prilikom preuzimanja“.",
+                itemId: incompleteItem.id,
+            });
         }
 
         const existing = await client.query(
@@ -1927,6 +1981,20 @@ app.post("/api/invoices", authenticate, requirePermission("invoices.create"), as
              VALUES ($1, 'INVOICED', $2, CURRENT_DATE, $4, $3)
              RETURNING id, invoice_no, status, payment_method, issued_at, due_date`,
             [orderId, paymentMethod, request.user.id, paymentMethod === "bank" ? dueDate : null],
+        );
+
+        await client.query(
+            `INSERT INTO route_jobs
+                (source_type, source_id, action_type, latitude, longitude)
+             SELECT 'INVOICE', i.id, 'DELIVERY', c.latitude, c.longitude
+             FROM invoices i
+             JOIN orders o ON o.id = i.order_id
+             JOIN customers c ON c.id = o.customer_id
+             WHERE i.id = $1 AND COALESCE(o.delivery_price, 0) > 0
+             ON CONFLICT (source_type, source_id, action_type)
+             DO UPDATE SET latitude = EXCLUDED.latitude, longitude = EXCLUDED.longitude,
+                           updated_at = NOW()`,
+            [result.rows[0].id],
         );
 
         await client.query("COMMIT");
@@ -1980,16 +2048,605 @@ app.patch("/api/invoices/:id/cancel", authenticate, requirePermission("invoices.
 
 
 
+function routePermission(permission) {
+    return requirePermission(permission);
+}
+
+async function ensurePickupRouteJob(orderId) {
+    const result = await pool.query(
+        `SELECT o.id, c.latitude, c.longitude
+         FROM orders o
+         JOIN customers c ON c.id = o.customer_id
+         WHERE o.id = $1`,
+        [orderId],
+    );
+    if (result.rowCount !== 1) return null;
+    const row = result.rows[0];
+    const job = await pool.query(
+        `INSERT INTO route_jobs
+            (source_type, source_id, action_type, latitude, longitude)
+         VALUES ('ORDER', $1, 'PICKUP', $2, $3)
+         ON CONFLICT (source_type, source_id, action_type)
+         DO UPDATE SET latitude = EXCLUDED.latitude,
+                       longitude = EXCLUDED.longitude,
+                       updated_at = NOW()
+         RETURNING id`,
+        [orderId, row.latitude, row.longitude],
+    );
+    return job.rows[0] || null;
+}
+
+async function ensureDeliveryRouteJob(invoiceId) {
+    const result = await pool.query(
+        `SELECT i.id, c.latitude, c.longitude
+         FROM invoices i
+         JOIN orders o ON o.id = i.order_id
+         JOIN customers c ON c.id = o.customer_id
+         WHERE i.id = $1`,
+        [invoiceId],
+    );
+    if (result.rowCount !== 1) return null;
+    const row = result.rows[0];
+    const job = await pool.query(
+        `INSERT INTO route_jobs
+            (source_type, source_id, action_type, latitude, longitude)
+         VALUES ('INVOICE', $1, 'DELIVERY', $2, $3)
+         ON CONFLICT (source_type, source_id, action_type)
+         DO UPDATE SET latitude = EXCLUDED.latitude,
+                       longitude = EXCLUDED.longitude,
+                       updated_at = NOW()
+         RETURNING id`,
+        [invoiceId, row.latitude, row.longitude],
+    );
+    return job.rows[0] || null;
+}
+
+
+app.post("/api/routes/jobs/from-order/:orderId", authenticate, routePermission("routes.assign"), async (request, response, next) => {
+    try {
+        const order = await pool.query(
+            `SELECT o.id, c.latitude, c.longitude
+             FROM orders o JOIN customers c ON c.id = o.customer_id
+             WHERE o.id = $1`,
+            [request.params.orderId],
+        );
+        if (order.rowCount !== 1) return response.status(404).json({ error: "Narudžba nije pronađena." });
+        const result = await pool.query(
+            `INSERT INTO route_jobs
+                (source_type, source_id, action_type, latitude, longitude)
+             VALUES ('ORDER', $1, 'PICKUP', $2, $3)
+             ON CONFLICT (source_type, source_id, action_type)
+             DO UPDATE SET latitude = EXCLUDED.latitude, longitude = EXCLUDED.longitude, updated_at = NOW()
+             RETURNING id, source_type, source_id, action_type, status`,
+            [request.params.orderId, order.rows[0].latitude, order.rows[0].longitude],
+        );
+        return response.status(201).json({ route: result.rows[0] });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+app.post("/api/routes/jobs/from-invoice/:invoiceId", authenticate, routePermission("routes.assign"), async (request, response, next) => {
+    try {
+        const invoice = await pool.query(
+            `SELECT i.id, c.latitude, c.longitude
+             FROM invoices i
+             JOIN orders o ON o.id = i.order_id
+             JOIN customers c ON c.id = o.customer_id
+             WHERE i.id = $1`,
+            [request.params.invoiceId],
+        );
+        if (invoice.rowCount !== 1) return response.status(404).json({ error: "Račun nije pronađen." });
+        const result = await pool.query(
+            `INSERT INTO route_jobs
+                (source_type, source_id, action_type, latitude, longitude)
+             VALUES ('INVOICE', $1, 'DELIVERY', $2, $3)
+             ON CONFLICT (source_type, source_id, action_type)
+             DO UPDATE SET latitude = EXCLUDED.latitude, longitude = EXCLUDED.longitude, updated_at = NOW()
+             RETURNING id, source_type, source_id, action_type, status`,
+            [request.params.invoiceId, invoice.rows[0].latitude, invoice.rows[0].longitude],
+        );
+        return response.status(201).json({ route: result.rows[0] });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+app.patch("/api/orders/:id/pickup", authenticate, routePermission("orders.edit"), async (request, response, next) => {
+    try {
+        const result = await pool.query(
+            `UPDATE orders
+             SET actual_pickup_at = COALESCE($1::timestamptz, NOW()),
+                 updated_at = NOW()
+             WHERE id = $2
+             RETURNING id, actual_pickup_at`,
+            [request.body?.actualPickupAt || null, request.params.id],
+        );
+        if (result.rowCount !== 1) return response.status(404).json({ error: "Narudžba nije pronađena." });
+        return response.json({ pickup: result.rows[0] });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+app.get("/api/routes", authenticate, routePermission("routes.view"), async (request, response, next) => {
+    try {
+        const result = await pool.query(`
+            SELECT r.id, r.source_type, r.source_id, r.action_type, r.vehicle_id,
+                   r.sequence_no, r.status, r.assigned_at, r.assigned_by,
+                   r.completed_at, r.last_attempt_at, r.last_attempt_by,
+                   r.attempt_count, r.note, v.name AS vehicle_name,
+                   o.order_number, i.invoice_no,
+                   COALESCE(o.planned_pickup_date, o.order_date) AS planned_pickup_date,
+                   o.pickup_time_from, o.pickup_time_to, o.actual_pickup_at,
+                   CONCAT_WS(' ', c.first_name, c.last_name) AS customer_name,
+                   c.phone, c.address, c.city, c.latitude, c.longitude
+            FROM route_jobs r
+            LEFT JOIN vehicles v ON v.id = r.vehicle_id
+            LEFT JOIN orders o ON r.source_type = 'ORDER' AND o.id = r.source_id
+            LEFT JOIN invoices i ON r.source_type = 'INVOICE' AND i.id = r.source_id
+            LEFT JOIN orders io ON io.id = i.order_id
+            LEFT JOIN customers c ON c.id = COALESCE(o.customer_id, io.customer_id)
+            WHERE r.status IN ('UNROUTED', 'ASSIGNED')
+            ORDER BY r.vehicle_id NULLS FIRST, r.sequence_no NULLS LAST, r.created_at, r.id
+        `);
+        return response.json({ routes: result.rows });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+app.get("/api/routes/vehicles", authenticate, routePermission("routes.view"), async (request, response, next) => {
+    try {
+        const result = await pool.query(
+            `SELECT id, name, is_active, sort_order
+             FROM vehicles
+             WHERE is_active = TRUE
+             ORDER BY sort_order, name`,
+        );
+        return response.json({ vehicles: result.rows });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+app.post("/api/routes/vehicles", authenticate, routePermission("routes.manage"), async (request, response, next) => {
+    try {
+        const name = String(request.body?.name || "").trim();
+        if (!name || name.length > 100) {
+            return response.status(400).json({ error: "Naziv vozila nije ispravan." });
+        }
+        const result = await pool.query(
+            `INSERT INTO vehicles (name, sort_order)
+             VALUES ($1, COALESCE((SELECT MAX(sort_order) + 1 FROM vehicles), 1))
+             RETURNING id, name, is_active, sort_order`,
+            [name],
+        );
+        return response.status(201).json({ vehicle: result.rows[0] });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+app.patch("/api/routes/jobs/:id/assign", authenticate, routePermission("routes.assign"), async (request, response, next) => {
+    try {
+        const vehicleId = String(request.body?.vehicleId || "").trim();
+        if (!vehicleId) {
+            return response.status(400).json({ error: "Vozilo nije izabrano." });
+        }
+        const vehicle = await pool.query(
+            `SELECT id FROM vehicles WHERE id = $1 AND is_active = TRUE`,
+            [vehicleId],
+        );
+        if (vehicle.rowCount !== 1) {
+            return response.status(400).json({ error: "Vozilo nije aktivno ili ne postoji." });
+        }
+        const result = await pool.query(
+            `UPDATE route_jobs
+             SET vehicle_id = $1, status = 'ASSIGNED', assigned_at = NOW(),
+                 assigned_by = $2,
+                 sequence_no = COALESCE(
+                     (SELECT MAX(sequence_no) + 1 FROM route_jobs
+                      WHERE vehicle_id = $1 AND status = 'ASSIGNED'), 1
+                 ),
+                 updated_at = NOW()
+             WHERE id = $3 AND status = 'UNROUTED'
+             RETURNING id, vehicle_id, status, sequence_no`,
+            [vehicleId, request.user.id, request.params.id],
+        );
+        if (result.rowCount !== 1) {
+            return response.status(404).json({ error: "Vožnja nije pronađena ili je već dodijeljena." });
+        }
+        return response.json({ route: result.rows[0] });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+app.patch("/api/routes/jobs/:id/reorder", authenticate, routePermission("routes.assign"), async (request, response, next) => {
+    const client = await pool.connect();
+    try {
+        const sequence = Number(request.body?.sequence);
+        if (!Number.isInteger(sequence) || sequence < 1) {
+            return response.status(400).json({ error: "Redoslijed nije ispravan." });
+        }
+
+        await client.query("BEGIN");
+        const current = await client.query(
+            `SELECT id, vehicle_id, sequence_no
+             FROM route_jobs
+             WHERE id = $1 AND status = 'ASSIGNED'
+             FOR UPDATE`,
+            [request.params.id],
+        );
+        if (current.rowCount !== 1) {
+            await client.query("ROLLBACK");
+            return response.status(404).json({ error: "Stavka rute nije pronađena." });
+        }
+
+        const vehicleId = current.rows[0].vehicle_id;
+        const oldSequence = Number(current.rows[0].sequence_no || 1);
+        const countResult = await client.query(
+            `SELECT COUNT(*)::int AS count
+             FROM route_jobs
+             WHERE vehicle_id = $1 AND status = 'ASSIGNED'`,
+            [vehicleId],
+        );
+        const maxSequence = countResult.rows[0].count;
+        const targetSequence = Math.min(sequence, maxSequence);
+
+        if (targetSequence !== oldSequence) {
+            await client.query(
+                `UPDATE route_jobs
+                 SET sequence_no = sequence_no + 1000000
+                 WHERE vehicle_id = $1 AND status = 'ASSIGNED'`,
+                [vehicleId],
+            );
+
+            if (targetSequence < oldSequence) {
+                await client.query(
+                    `UPDATE route_jobs
+                     SET sequence_no = sequence_no + 1
+                     WHERE vehicle_id = $1 AND status = 'ASSIGNED'
+                       AND sequence_no >= $2 + 1000000
+                       AND sequence_no < $3 + 1000000`,
+                    [vehicleId, targetSequence, oldSequence],
+                );
+            } else {
+                await client.query(
+                    `UPDATE route_jobs
+                     SET sequence_no = sequence_no - 1
+                     WHERE vehicle_id = $1 AND status = 'ASSIGNED'
+                       AND sequence_no > $2 + 1000000
+                       AND sequence_no <= $3 + 1000000`,
+                    [vehicleId, oldSequence, targetSequence],
+                );
+            }
+
+            await client.query(
+                `UPDATE route_jobs
+                 SET sequence_no = $1, updated_at = NOW()
+                 WHERE id = $2`,
+                [targetSequence, request.params.id],
+            );
+
+            await client.query(
+                `UPDATE route_jobs
+                 SET sequence_no = sequence_no - 1000000,
+                     updated_at = NOW()
+                 WHERE vehicle_id = $1 AND status = 'ASSIGNED'
+                   AND sequence_no >= 1000001`,
+                [vehicleId],
+            );
+        }
+
+        await client.query("COMMIT");
+        return response.json({ route: { id: request.params.id, sequence_no: targetSequence } });
+    } catch (error) {
+        await client.query("ROLLBACK").catch(() => {});
+        return next(error);
+    } finally {
+        client.release();
+    }
+});
+
+app.patch("/api/routes/jobs/:id/not-driven", authenticate, routePermission("routes.assign"), async (request, response, next) => {
+    const client = await pool.connect();
+    try {
+        await client.query("BEGIN");
+        const current = await client.query(
+            `SELECT id, vehicle_id
+             FROM route_jobs
+             WHERE id = $1 AND status = 'ASSIGNED'
+             FOR UPDATE`,
+            [request.params.id],
+        );
+        if (current.rowCount !== 1) {
+            await client.query("ROLLBACK");
+            return response.status(404).json({ error: "Vožnja nije pronađena u ruti vozila." });
+        }
+        await client.query(
+            `INSERT INTO route_attempts (route_job_id, vehicle_id, user_id, result)
+             VALUES ($1, $2, $3, 'NOT_DRIVEN')`,
+            [request.params.id, current.rows[0].vehicle_id, request.user.id],
+        );
+        const result = await client.query(
+            `UPDATE route_jobs
+             SET vehicle_id = NULL, status = 'UNROUTED',
+                 last_attempt_at = NOW(), last_attempt_by = $1,
+                 attempt_count = attempt_count + 1, updated_at = NOW()
+             WHERE id = $2
+             RETURNING id, status, attempt_count`,
+            [request.user.id, request.params.id],
+        );
+        await client.query("COMMIT");
+        return response.json({ route: result.rows[0] });
+    } catch (error) {
+        await client.query("ROLLBACK").catch(() => {});
+        return next(error);
+    } finally {
+        client.release();
+    }
+});
+
+app.patch("/api/routes/jobs/:id/complete", authenticate, routePermission("routes.assign"), async (request, response, next) => {
+    try {
+        const result = await pool.query(
+            `UPDATE route_jobs
+             SET status = 'COMPLETED', completed_at = NOW(), updated_at = NOW()
+             WHERE id = $1 AND status = 'ASSIGNED'
+             RETURNING id, status, completed_at`,
+            [request.params.id],
+        );
+        if (result.rowCount !== 1) {
+            return response.status(404).json({ error: "Vožnja nije pronađena u aktivnoj ruti." });
+        }
+        return response.json({ route: result.rows[0] });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+app.post("/api/routes/optimize/:vehicleId", authenticate, routePermission("routes.assign"), async (request, response, next) => {
+    try {
+        const vehicleId = String(request.params.vehicleId || "").trim();
+        const settings = await pool.query(
+            `SELECT setting_value FROM app_settings WHERE setting_key = 'company.base_coordinates'`,
+        );
+        const base = settings.rows[0]?.setting_value || {};
+        let current = {
+            latitude: Number(base.latitude),
+            longitude: Number(base.longitude),
+        };
+        if (!Number.isFinite(current.latitude) || !Number.isFinite(current.longitude)) {
+            return response.status(400).json({
+                error: "Koordinate baze Super Clean nisu podešene. Ruta nije automatski mijenjana.",
+            });
+        }
+
+        const jobs = await pool.query(
+            `SELECT id, latitude, longitude
+             FROM route_jobs
+             WHERE vehicle_id = $1 AND status = 'ASSIGNED'
+               AND latitude IS NOT NULL AND longitude IS NOT NULL`,
+            [vehicleId],
+        );
+        const remaining = jobs.rows.map((row) => ({
+            id: row.id,
+            latitude: Number(row.latitude),
+            longitude: Number(row.longitude),
+        }));
+        const ordered = [];
+
+        while (remaining.length) {
+            let bestIndex = 0;
+            let bestDistance = Number.POSITIVE_INFINITY;
+            remaining.forEach((job, index) => {
+                const distance = Math.hypot(
+                    job.latitude - current.latitude,
+                    job.longitude - current.longitude,
+                );
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestIndex = index;
+                }
+            });
+            const [next] = remaining.splice(bestIndex, 1);
+            ordered.push(next);
+            current = next;
+        }
+
+        for (let index = 0; index < ordered.length; index += 1) {
+            await pool.query(
+                `UPDATE route_jobs SET sequence_no = $1, updated_at = NOW() WHERE id = $2`,
+                [index + 1, ordered[index].id],
+            );
+        }
+
+        return response.json({
+            vehicleId,
+            optimized: ordered.map((job, index) => ({ id: job.id, sequence: index + 1 })),
+        });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+app.get("/api/cashier", authenticate, routePermission("cashier.view"), async (request, response, next) => {
+    try {
+        const result = await pool.query(`
+            SELECT i.id, i.invoice_no, i.status, i.issued_at,
+                   CONCAT_WS(' ', c.first_name, c.last_name) AS customer_name,
+                   COALESCE(p.paid, FALSE) AS paid,
+                   p.payment_method, p.paid_at,
+                   CONCAT_WS(' ', u.first_name, u.last_name) AS paid_by_name
+            FROM invoices i
+            JOIN orders o ON o.id = i.order_id
+            JOIN customers c ON c.id = o.customer_id
+            LEFT JOIN invoice_payments p ON p.invoice_id = i.id
+            LEFT JOIN users u ON u.id = p.paid_by
+            ORDER BY i.issued_at DESC, i.invoice_no DESC
+            LIMIT 500
+        `);
+        return response.json({ invoices: result.rows });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+app.post("/api/cashier/:invoiceId/pay", authenticate, routePermission("cashier.edit"), async (request, response, next) => {
+    try {
+        const method = String(request.body?.paymentMethod || "").trim().toLowerCase();
+        if (!method || method.length > 50) {
+            return response.status(400).json({ error: "Način plaćanja nije ispravan." });
+        }
+        const result = await pool.query(
+            `INSERT INTO invoice_payments (invoice_id, paid, payment_method, paid_at, paid_by)
+             VALUES ($1, TRUE, $2, NOW(), $3)
+             ON CONFLICT (invoice_id)
+             DO UPDATE SET paid = TRUE, payment_method = EXCLUDED.payment_method,
+                           paid_at = EXCLUDED.paid_at, paid_by = EXCLUDED.paid_by
+             RETURNING invoice_id, paid, payment_method, paid_at, paid_by`,
+            [request.params.invoiceId, method, request.user.id],
+        );
+        return response.json({ payment: result.rows[0] });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+
+app.get("/api/admin/memorandum", authenticate, requirePermission("admin.settings"), async (request, response, next) => {
+    try {
+        const result = await pool.query(
+            `SELECT setting_key, setting_value
+             FROM app_settings
+             WHERE setting_key IN ('company.memorandum', 'company.base_coordinates')`,
+        );
+        const settings = Object.fromEntries(result.rows.map((row) => [row.setting_key, row.setting_value]));
+        return response.json({
+            memorandum: settings["company.memorandum"] || {
+                companyName: "SUPER CLEAN TEPIH SERVIS",
+                address: "Banja Luka",
+                phone: "066 311 221",
+                email: "superclean.bl@gmail.com",
+                website: "superclean.bl",
+            },
+            baseCoordinates: settings["company.base_coordinates"] || {},
+        });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+app.put("/api/admin/memorandum", authenticate, requirePermission("admin.settings"), async (request, response, next) => {
+    try {
+        const body = request.body || {};
+        const memorandum = {
+            companyName: String(body.companyName || "").trim().slice(0, 200),
+            address: String(body.address || "").trim().slice(0, 250),
+            phone: String(body.phone || "").trim().slice(0, 50),
+            email: String(body.email || "").trim().slice(0, 150),
+            website: String(body.website || "").trim().slice(0, 150),
+        };
+        const latitude = body.baseLatitude === "" || body.baseLatitude == null ? null : Number(body.baseLatitude);
+        const longitude = body.baseLongitude === "" || body.baseLongitude == null ? null : Number(body.baseLongitude);
+        if ((latitude !== null && !Number.isFinite(latitude)) || (longitude !== null && !Number.isFinite(longitude))) {
+            return response.status(400).json({ error: "Koordinate baze nisu ispravne." });
+        }
+
+        await pool.query(
+            `INSERT INTO app_settings (setting_key, setting_value, updated_by)
+             VALUES ('company.memorandum', $1::jsonb, $2)
+             ON CONFLICT (setting_key)
+             DO UPDATE SET setting_value = EXCLUDED.setting_value,
+                           updated_by = EXCLUDED.updated_by, updated_at = NOW()`,
+            [JSON.stringify(memorandum), request.user.id],
+        );
+        await pool.query(
+            `INSERT INTO app_settings (setting_key, setting_value, updated_by)
+             VALUES ('company.base_coordinates', $1::jsonb, $2)
+             ON CONFLICT (setting_key)
+             DO UPDATE SET setting_value = EXCLUDED.setting_value,
+                           updated_by = EXCLUDED.updated_by, updated_at = NOW()`,
+            [JSON.stringify({ latitude, longitude }), request.user.id],
+        );
+        return response.json({ memorandum, baseCoordinates: { latitude, longitude } });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+app.patch("/api/routes/vehicles/:id", authenticate, routePermission("routes.manage"), async (request, response, next) => {
+    try {
+        const name = String(request.body?.name || "").trim();
+        const isActive = request.body?.isActive !== false;
+        if (!name || name.length > 100) {
+            return response.status(400).json({ error: "Naziv vozila nije ispravan." });
+        }
+        if (!isActive) {
+            const activeJobs = await pool.query(
+                `SELECT COUNT(*)::int AS count
+                 FROM route_jobs
+                 WHERE vehicle_id = $1 AND status = 'ASSIGNED'`,
+                [request.params.id],
+            );
+            if (activeJobs.rows[0].count > 0) {
+                return response.status(409).json({
+                    error: "Vozilo se ne može deaktivirati dok ima dodijeljene vožnje.",
+                    activeJobs: activeJobs.rows[0].count,
+                });
+            }
+        }
+        const result = await pool.query(
+            `UPDATE vehicles
+             SET name = $1, is_active = $2, updated_at = NOW()
+             WHERE id = $3
+             RETURNING id, name, is_active, sort_order`,
+            [name, isActive, request.params.id],
+        );
+        if (result.rowCount !== 1) {
+            return response.status(404).json({ error: "Vozilo nije pronađeno." });
+        }
+        return response.json({ vehicle: result.rows[0] });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+app.patch("/api/cashier/:invoiceId/unpay", authenticate, routePermission("cashier.edit"), async (request, response, next) => {
+    try {
+        const result = await pool.query(
+            `UPDATE invoice_payments
+             SET paid = FALSE, payment_method = NULL, paid_at = NULL, paid_by = NULL
+             WHERE invoice_id = $1
+             RETURNING invoice_id, paid`,
+            [request.params.invoiceId],
+        );
+        if (result.rowCount !== 1) {
+            return response.status(404).json({ error: "Naplaćivanje nije pronađeno." });
+        }
+        return response.json({ payment: result.rows[0] });
+    } catch (error) {
+        return next(error);
+    }
+});
+
 const BACKUP_TABLES = [
     ["roles", "SELECT code, name, description, is_system, created_at, updated_at FROM roles ORDER BY code"],
     ["permissions", "SELECT code, name, module, created_at FROM permissions ORDER BY code"],
     ["role_permissions", "SELECT role_code, permission_code FROM role_permissions ORDER BY role_code, permission_code"],
     ["users", "SELECT id, username, first_name, last_name, role, is_active, created_at, updated_at FROM users ORDER BY username"],
     ["customers", "SELECT id, first_name, last_name, company_name, phone, whatsapp, address, city, note, latitude, longitude, is_active, created_at, updated_at FROM customers ORDER BY created_at, id"],
-    ["orders", "SELECT id, order_number, customer_id, order_date, status, note, created_by, delivery_requested, delivery_price, created_at, updated_at FROM orders ORDER BY order_number"],
-    ["order_items", "SELECT id, order_id, service_name, unit, length_m, width_m, quantity, unit_price, area_m2, total, note, qr_scan_count, last_qr_scanned_at, created_at, updated_at FROM order_items ORDER BY created_at, id"],
+    ["orders", "SELECT id, order_number, customer_id, order_date, planned_pickup_date, pickup_time_from, pickup_time_to, actual_pickup_at, status, note, created_by, delivery_requested, delivery_price, created_at, updated_at FROM orders ORDER BY order_number"],
+    ["order_items", "SELECT id, order_id, service_name, unit, length_m, width_m, quantity, unit_price, area_m2, total, note, measured_at_pickup, qr_scan_count, last_qr_scanned_at, created_at, updated_at FROM order_items ORDER BY created_at, id"],
     ["price_list", "SELECT id, service_name, unit, price, is_active, sort_order, created_at, updated_at FROM price_list ORDER BY sort_order, service_name"],
-    ["invoices", "SELECT id, order_id, invoice_no, status, payment_method, issued_at, cancelled_at, created_by, created_at, updated_at FROM invoices ORDER BY invoice_no"],
+    ["invoices", "SELECT id, order_id, invoice_no, status, payment_method, issued_at, due_date, cancelled_at, created_by, created_at, updated_at FROM invoices ORDER BY invoice_no"],
+    ["vehicles", "SELECT id, name, is_active, sort_order, created_at, updated_at FROM vehicles ORDER BY sort_order, name"],
+    ["route_jobs", "SELECT id, source_type, source_id, action_type, vehicle_id, sequence_no, status, latitude, longitude, assigned_at, assigned_by, completed_at, last_attempt_at, last_attempt_by, attempt_count, note, created_at, updated_at FROM route_jobs ORDER BY created_at, id"],
+    ["route_attempts", "SELECT id, route_job_id, vehicle_id, user_id, result, created_at FROM route_attempts ORDER BY id"],
+    ["invoice_payments", "SELECT invoice_id, paid, payment_method, paid_at, paid_by FROM invoice_payments ORDER BY invoice_id"],
+    ["app_settings", "SELECT setting_key, setting_value, updated_by, updated_at FROM app_settings ORDER BY setting_key"],
 ];
 
 async function createBusinessBackup({ createdBy = null, automatic = false } = {}) {
@@ -2837,18 +3494,28 @@ app.get("/api/geocode", authenticate, requirePermission("customers.view"), async
 app.get("/api/health", async (request, response, next) => {
     try {
         await pool.query("SELECT 1");
-        response.json({ ok: true });
+        return response.json({ ok: true });
     } catch (error) {
-        next(error);
+        return next(error);
     }
+});
 
+app.get("/{*splat}", async (request, response, next) => {
     if (request.path.startsWith("/api/")) {
         return next();
     }
- app.get("/{*splat}", async (request, response, next) => {
-    
+
+    try {
         const indexPath = path.join(__dirname, "public", "index.html");
-        return response.send(await fs.readFile(indexPath, "utf8"));
+        const indexHtml = await fs.readFile(indexPath, "utf8");
+        const enhancementAssets = `
+<link rel="stylesheet" href="/ab-enhancements.css">
+<script src="/ab-enhancements.js" defer></script>`;
+        return response.send(
+            indexHtml.includes("/ab-enhancements.js")
+                ? indexHtml
+                : indexHtml.replace("</body>", `${enhancementAssets}\n</body>`),
+        );
     } catch (error) {
         return next(error);
     }
@@ -2875,6 +3542,95 @@ async function ensureInvoiceDueDateColumn() {
     );
 }
 
+async function ensureV2Columns() {
+    await pool.query(`ALTER TABLE orders
+        ADD COLUMN IF NOT EXISTS planned_pickup_date DATE,
+        ADD COLUMN IF NOT EXISTS pickup_time_from TIME,
+        ADD COLUMN IF NOT EXISTS pickup_time_to TIME,
+        ADD COLUMN IF NOT EXISTS actual_pickup_at TIMESTAMPTZ`);
+    await pool.query(`UPDATE orders
+        SET planned_pickup_date = COALESCE(planned_pickup_date, order_date)
+        WHERE planned_pickup_date IS NULL`);
+    await pool.query(`ALTER TABLE order_items
+        ADD COLUMN IF NOT EXISTS measured_at_pickup BOOLEAN NOT NULL DEFAULT FALSE`);
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS vehicles (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            name VARCHAR(100) NOT NULL UNIQUE,
+            is_active BOOLEAN NOT NULL DEFAULT TRUE,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )`);
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS route_jobs (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            source_type VARCHAR(20) NOT NULL CHECK (source_type IN ('ORDER', 'INVOICE')),
+            source_id UUID NOT NULL,
+            action_type VARCHAR(20) NOT NULL CHECK (action_type IN ('PICKUP', 'DELIVERY')),
+            vehicle_id UUID REFERENCES vehicles(id) ON DELETE SET NULL,
+            sequence_no INTEGER,
+            status VARCHAR(20) NOT NULL DEFAULT 'UNROUTED'
+                CHECK (status IN ('UNROUTED', 'ASSIGNED', 'COMPLETED')),
+            latitude DOUBLE PRECISION,
+            longitude DOUBLE PRECISION,
+            assigned_at TIMESTAMPTZ,
+            assigned_by UUID REFERENCES users(id) ON DELETE SET NULL,
+            completed_at TIMESTAMPTZ,
+            last_attempt_at TIMESTAMPTZ,
+            last_attempt_by UUID REFERENCES users(id) ON DELETE SET NULL,
+            attempt_count INTEGER NOT NULL DEFAULT 0,
+            note TEXT NOT NULL DEFAULT '',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            UNIQUE (source_type, source_id, action_type)
+        )`);
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS route_attempts (
+            id BIGSERIAL PRIMARY KEY,
+            route_job_id UUID NOT NULL REFERENCES route_jobs(id) ON DELETE CASCADE,
+            vehicle_id UUID REFERENCES vehicles(id) ON DELETE SET NULL,
+            user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+            result VARCHAR(30) NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )`);
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS invoice_payments (
+            invoice_id UUID PRIMARY KEY REFERENCES invoices(id) ON DELETE CASCADE,
+            paid BOOLEAN NOT NULL DEFAULT FALSE,
+            payment_method VARCHAR(50),
+            paid_at TIMESTAMPTZ,
+            paid_by UUID REFERENCES users(id) ON DELETE SET NULL
+        )`);
+
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS app_settings (
+            setting_key VARCHAR(150) PRIMARY KEY,
+            setting_value JSONB NOT NULL DEFAULT '{}'::jsonb,
+            updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )`);
+
+    await pool.query(`
+        INSERT INTO vehicles (name, sort_order)
+        VALUES ('Vozilo 1', 1), ('Vozilo 2', 2)
+        ON CONFLICT (name) DO NOTHING`);
+
+    await pool.query(`
+        INSERT INTO permissions (code, name, module)
+        VALUES
+            ('routes.view', 'Pregled ruta', 'Ruta'),
+            ('routes.assign', 'Dodjela i vođenje ruta', 'Ruta'),
+            ('routes.manage', 'Upravljanje vozilima', 'Ruta'),
+            ('cashier.view', 'Pregled blagajne', 'Blagajna'),
+            ('cashier.edit', 'Evidentiranje naplate', 'Blagajna')
+        ON CONFLICT (code) DO NOTHING`);
+}
+
 async function ensureQrScanColumns() {
     await pool.query(
         `ALTER TABLE order_items
@@ -2890,6 +3646,7 @@ async function start() {
     await pool.query("SELECT 1");
     await ensureInvoiceDueDateColumn();
     await ensureQrScanColumns();
+    await ensureV2Columns();
     await cleanupSessions();
 
     setInterval(() => {
