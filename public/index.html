@@ -4,7 +4,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0b3f91">
+    <meta name="description" content="Super Clean Banja Luka - upravljanje poslovanjem">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Super Clean">
     <title>Super Clean Banja Luka</title>
+
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIINfQ3wKcWQ5w2q4j2q1g6JmF4q0M9Jm6Q="
         crossorigin="">
@@ -12,9 +21,19 @@
 </head>
 <body>
     <div id="app"></div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
     <script src="/app.js" defer></script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function () {
+                navigator.serviceWorker.register("/service-worker.js").catch(function (error) {
+                    console.warn("Service worker registration failed:", error);
+                });
+            });
+        }
+    </script>
 </body>
 </html>
