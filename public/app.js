@@ -59,6 +59,10 @@ let currentUser = null;
 let rolesData = [];
 let permissionsData = [];
 
+let currentPage = "home";
+let activeAdminTab = "users";
+let selectedRecord = null;
+
 function escapeHtml(value) {
     return String(value)
         .replaceAll("&", "&amp;")
@@ -1873,11 +1877,39 @@ function openModal(html) {
     if (roleFormElement) {
         roleFormElement.addEventListener("submit", handleRoleSubmit);
     }
+    
+    const priceFormElement = root.querySelector("#price-form");
+if (priceFormElement) {
+    priceFormElement.addEventListener("submit", handlePriceSubmit);
+}
 }
 
+function clearSelectedRecord() {
+    selectedRecord = null;
+    document.querySelectorAll(".record-selected").forEach((element) => {
+        element.classList.remove("record-selected");
+    });
+    
+function bindRecordSelection() {
+    document.querySelectorAll("[data-record-type][data-record-id]").forEach((element) => {
+        element.addEventListener("click", () => {
+            document.querySelectorAll(".record-selected").forEach((item) => {
+                item.classList.remove("record-selected");
+            });
+
+            element.classList.add("record-selected");
+            selectedRecord = {
+                type: element.dataset.recordType,
+                id: element.dataset.recordId,
+                element
+            };
+        });
+    });
+}
 
 function bindUserActions() {
-    document.getElementById("add-user")?.addEventListener("click", () => openModal(userForm()));
+document.getElementById("add-user")?.addEventListener("click", () => openModal(userForm()));
+
     document.querySelectorAll(".edit-user").forEach((button) => {
         button.addEventListener("click", async () => {
             try {
@@ -1891,6 +1923,7 @@ function bindUserActions() {
     });
 }
 
+    
 function bindRoleActions() {
     document.getElementById("add-role")?.addEventListener("click", () => openModal(roleForm()));
     document.querySelectorAll(".edit-role").forEach((button) => {
