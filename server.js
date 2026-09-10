@@ -2887,24 +2887,26 @@ async function restoreBusinessBackup(payload) {
     try {
         await client.query("BEGIN");
 
+        // Preserve audit/history records while removing references to users that will be restored.
+        await client.query("UPDATE audit_logs SET user_id = NULL");
+        await client.query("UPDATE backup_records SET created_by = NULL");
+
         await client.query(`
-            TRUNCATE TABLE
-                sessions,
-                route_attempts,
-                route_jobs,
-                invoice_payments,
-                invoices,
-                order_items,
-                orders,
-                customers,
-                role_permissions,
-                users,
-                roles,
-                permissions,
-                price_list,
-                vehicles,
-                app_settings
-            RESTART IDENTITY
+            DELETE FROM sessions;
+            DELETE FROM route_attempts;
+            DELETE FROM invoice_payments;
+            DELETE FROM route_jobs;
+            DELETE FROM invoices;
+            DELETE FROM order_items;
+            DELETE FROM orders;
+            DELETE FROM customers;
+            DELETE FROM role_permissions;
+            DELETE FROM app_settings;
+            DELETE FROM users;
+            DELETE FROM roles;
+            DELETE FROM permissions;
+            DELETE FROM price_list;
+            DELETE FROM vehicles;
         `);
 
         for (const table of restoreOrder) {
