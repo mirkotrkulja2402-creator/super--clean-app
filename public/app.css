@@ -3430,3 +3430,333 @@ button:disabled { opacity: .6; cursor: wait; }
         flex-direction: column;
     }
 }
+
+/* Super Clean - new home screen */
+
+.sc-home-app {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 8% 8%, rgba(120, 184, 42, 0.16), transparent 30%),
+        radial-gradient(circle at 92% 92%, rgba(11, 63, 145, 0.16), transparent 32%),
+        linear-gradient(145deg, #eef7ff 0%, #f8fbff 55%, #eef8f3 100%);
+}
+
+.sc-home-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.92);
+    border-bottom: 1px solid rgba(207, 224, 245, 0.8);
+    backdrop-filter: blur(14px);
+}
+
+.sc-header-brand {
+    text-align: center;
+}
+
+.sc-header-brand strong {
+    color: #0b3f91;
+    font-size: 17px;
+    font-weight: 900;
+    letter-spacing: 0.4px;
+}
+
+.sc-header-brand span {
+    color: #78b82a;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.sc-home-content {
+    width: min(760px, 100%);
+    margin: 0 auto;
+    padding: 18px 14px 30px;
+}
+
+.sc-home-hero {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    padding: 8px 10px 22px;
+}
+
+.sc-home-logo {
+    width: min(235px, 62vw);
+    height: min(235px, 62vw);
+    display: block;
+    object-fit: contain;
+    margin: 0 auto 2px;
+}
+
+.sc-home-hero h1 {
+    margin: 0;
+    color: #0b3f91;
+    font-size: clamp(32px, 8vw, 46px);
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: -1px;
+}
+
+.sc-home-hero p {
+    margin: 8px 0 0;
+    color: #78b82a;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.sc-home-panel {
+    padding: 20px 16px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 22px 60px rgba(20, 55, 95, 0.14);
+}
+
+.sc-home-panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.sc-home-eyebrow {
+    display: block;
+    margin-bottom: 4px;
+    color: #78b82a;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.sc-home-panel-heading h2 {
+    margin: 0;
+    color: #163f70;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.sc-home-user {
+    max-width: 110px;
+    padding: 7px 10px;
+    border-radius: 12px;
+    background: #edf5ff;
+    color: #0b3f91;
+    font-size: 12px;
+    font-weight: 900;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sc-home-new-order {
+    width: 100%;
+    min-height: 70px;
+    display: grid;
+    grid-template-columns: 48px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 10px 15px;
+    border: 0;
+    border-radius: 19px;
+    background: linear-gradient(135deg, #0b3f91, #1765c4);
+    color: #fff;
+    text-align: left;
+    box-shadow: 0 12px 26px rgba(11, 63, 145, 0.22);
+}
+
+.sc-home-new-order:active {
+    transform: translateY(1px);
+}
+
+.sc-home-new-order-icon {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.18);
+    font-size: 22px;
+}
+
+.sc-home-new-order span:nth-child(2) {
+    min-width: 0;
+}
+
+.sc-home-new-order strong {
+    display: block;
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.sc-home-new-order small {
+    display: block;
+    margin-top: 3px;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.sc-home-new-order b {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.sc-home-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.sc-home-card {
+    min-width: 0;
+    min-height: 112px;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    align-items: center;
+    column-gap: 11px;
+    position: relative;
+    padding: 14px 13px;
+    border: 1px solid #dce8f5;
+    border-radius: 20px;
+    background: #fff;
+    color: #163f70;
+    text-align: left;
+    box-shadow: 0 7px 20px rgba(20, 55, 95, 0.07);
+}
+
+.sc-home-card:active {
+    transform: scale(0.985);
+}
+
+.sc-home-card:hover {
+    border-color: #b8d2ef;
+    box-shadow: 0 10px 25px rgba(20, 55, 95, 0.1);
+}
+
+.sc-home-card-icon {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    grid-row: 1 / span 2;
+    border-radius: 15px;
+    background: #edf5ff;
+    color: #0b3f91;
+    font-size: 22px;
+}
+
+.sc-home-card-text {
+    min-width: 0;
+    align-self: center;
+}
+
+.sc-home-card-text strong {
+    display: block;
+    color: #163f70;
+    font-size: 15px;
+    line-height: 1.15;
+    font-weight: 900;
+}
+
+.sc-home-card-text small {
+    display: block;
+    margin-top: 5px;
+    color: #8295aa;
+    font-size: 10px;
+    line-height: 1.25;
+    font-weight: 700;
+}
+
+.sc-home-card-arrow {
+    position: absolute;
+    right: 11px;
+    bottom: 8px;
+    color: #78b82a;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.sc-home-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 18px 0 4px;
+    color: #8295aa;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.sc-home-footer b {
+    color: #78b82a;
+}
+
+@media (max-width: 480px) {
+    .sc-home-content {
+        padding: 12px 10px 24px;
+    }
+
+    .sc-home-logo {
+        width: min(215px, 61vw);
+        height: min(215px, 61vw);
+    }
+
+    .sc-home-hero {
+        padding-bottom: 17px;
+    }
+
+    .sc-home-hero h1 {
+        font-size: 34px;
+    }
+
+    .sc-home-panel {
+        padding: 17px 12px 14px;
+        border-radius: 27px;
+    }
+
+    .sc-home-panel-heading h2 {
+        font-size: 18px;
+    }
+
+    .sc-home-grid {
+        gap: 9px;
+    }
+
+    .sc-home-card {
+        min-height: 105px;
+        grid-template-columns: 42px minmax(0, 1fr);
+        padding: 12px 10px;
+        border-radius: 17px;
+    }
+
+    .sc-home-card-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 13px;
+        font-size: 19px;
+    }
+
+    .sc-home-card-text strong {
+        font-size: 13px;
+    }
+
+    .sc-home-card-text small {
+        font-size: 9px;
+    }
+
+    .sc-home-new-order {
+        min-height: 66px;
+        grid-template-columns: 43px 1fr auto;
+        padding: 9px 12px;
+        border-radius: 17px;
+    }
+
+    .sc-home-new-order-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+    }
+}
