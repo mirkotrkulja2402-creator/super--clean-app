@@ -75,61 +75,94 @@ function escapeHtml(value) {
 function hasPermission(code) {
     return currentUser?.role === "ADMIN" || currentUser?.permissions?.includes(code);
 }
-
 function homeContent() {
-    const cards = mainMenu
+    const menuItems = mainMenu
         .filter(([, , , permission]) => hasPermission(permission))
-        .map(([icon, title, description]) => `
-            <button class="home-card" data-page-label="${escapeHtml(title)}">
-                <span class="home-icon">${icon}</span>
-                <strong>${escapeHtml(title)}</strong>
-                <small>${escapeHtml(description)}</small>
+        .map(([icon, title, description]) => ({
+            icon,
+            title,
+            description,
+        }));
+
+    if (currentUser.role === "ADMIN") {
+        menuItems.push({
+            icon: "⚙️",
+            title: "Administrator",
+            description: "Upravljanje aplikacijom",
+        });
+    }
+
+    const cards = menuItems
+        .map((item) => `
+            <button
+                class="sc-home-card"
+                type="button"
+                data-page-label="${escapeHtml(item.title)}"
+            >
+                <span class="sc-home-card-icon">${item.icon}</span>
+                <span class="sc-home-card-text">
+                    <strong>${escapeHtml(item.title)}</strong>
+                    <small>${escapeHtml(item.description)}</small>
+                </span>
+                <span class="sc-home-card-arrow" aria-hidden="true">›</span>
             </button>
         `)
         .join("");
 
     return `
-        <section class="welcome">
-            <div>
-                <span>Dobro došao</span>
-                <h1>${escapeHtml(currentUser.firstName)} 👋</h1>
-            </div>
-            <span class="role-badge">${escapeHtml(currentUser.roleName || currentUser.role)}</span>
+        <section class="sc-home-hero">
+            <img
+                class="sc-home-logo"
+                src="/logo-login.png"
+                alt="Super Clean"
+            >
+
+            <h1>Super Clean</h1>
+            <p>Banja Luka · poslovna aplikacija</p>
         </section>
 
-        <section class="dashboard-section">
-            <div class="dashboard-section-heading">
+        <section class="sc-home-panel">
+            <div class="sc-home-panel-heading">
                 <div>
-                    <span class="eyebrow">DANAS</span>
-                    <h2>Pregled dana</h2>
+                    <span class="sc-home-eyebrow">GLAVNI MENI</span>
+                    <h2>Šta želiš otvoriti?</h2>
                 </div>
-                <span id="dashboard-date" class="dashboard-date"></span>
+
+                <span class="sc-home-user">
+                    ${escapeHtml(currentUser.firstName || "")}
+                </span>
             </div>
-            <div id="dashboard-summary" class="dashboard-summary">
-                <div class="dashboard-loading">Učitavam pregled...</div>
+
+            <button
+                class="sc-home-new-order"
+                type="button"
+                data-page-label="Nova narudžba"
+            >
+                <span class="sc-home-new-order-icon">➕</span>
+
+                <span>
+                    <strong>NOVA NARUDŽBA</strong>
+                    <small>Brz prijem novog tepiha</small>
+                </span>
+
+                <b aria-hidden="true">→</b>
+            </button>
+
+            <div class="sc-home-grid">
+                ${cards}
             </div>
         </section>
 
-        <section class="dashboard-section" id="dashboard-warnings-section">
-            <div class="dashboard-section-heading">
-                <div>
-                    <span class="eyebrow">KONTROLA</span>
-                    <h2>Upozorenja</h2>
-                </div>
-            </div>
-            <div id="dashboard-warnings">
-                <div class="dashboard-loading">Provjeravam podatke...</div>
-            </div>
-        </section>
-
-        <button class="new-order" data-page-label="Nova narudžba">
-            <span>➕</span>
-            <div><strong>NOVA NARUDŽBA</strong><small>Unesi novi prijem tepiha</small></div>
-            <b>›</b>
-        </button>
-        <section class="home-grid">${cards}</section>
+        <footer class="sc-home-footer">
+            <span>Čisto</span>
+            <b>•</b>
+            <span>Brzo</span>
+            <b>•</b>
+            <span>Profesionalno</span>
+        </footer>
     `;
 }
+
 
 function loginView(error = "") {
     app.innerHTML = `
@@ -216,95 +249,14 @@ function loginView(error = "") {
 
     document.getElementById("change-user-button").addEventListener("click", logout);
 }
-function dashboardView(user) {
-    currentUser = user;
-    app.innerHTML = `
-        <div class="mobile-app">
-            <header class="mobile-header">
-                <button class="icon-button" id="menu-toggle" aria-label="Meni">☰</button>
-                <div class="header-brand">
-                    <strong>SUPER CLEAN</strong>
-                    <span>Banja Luka</span>
-                </div>
-                <button class="icon-button" id="user-menu" aria-label="Korisnik">👤</button>
-            </header>
-
-            <div class="mobile-search">
-                <span>🔎</span>
-                <input id="global-search" placeholder="Pretraži..." aria-label="Pretraži">
-            </div>
-
-            <div class="quick-toolbar" aria-label="Brze radnje">
-                <button data-action="add">➕<span>Dodaj</span></button>
-                <button data-action="remove">🗑️<span>Ukloni</span></button>
-                <button data-action="print">🖨️<span>Print</span></button>
-                <button data-action="pdf">📄<span>PDF</span></button>
-                <button data-action="search">🔎<span>Pretraga</span></button>
-                <button id="more-actions">⋯<span>Više</span></button>
-            </div>
-
-            <main id="page-content">${homeContent()}</main>
-
-            <nav class="bottom-nav">
-                <button data-page="home">🏠<span>Početna</span></button>
-                ${hasPermission("orders.view") ? '<button data-page="orders">📋<span>Narudžbe</span></button>' : ""}
-                ${hasPermission("customers.view") ? '<button data-page="customers">👥<span>Kupci</span></button>' : ""}
-                ${user.role === "ADMIN" ? '<button data-page="admin">⚙️<span>Admin</span></button>' : ""}
-            </nav>
-
-            <div id="drawer" class="drawer hidden"></div>
-            <div id="modal-root"></div>
-            <input id="excel-file" type="file" accept=".xlsx,.xls,.csv" class="hidden">
-        </div>
-    `;
-
-    bindDashboard();
-    loadDashboard();
-}
+f
 function dashboardSummaryContent(summary) {
     const cards = [
         hasPermission("orders.view") ? ["📋", "Narudžbe", summary.orderCount, ""] : null,
         hasPermission("orders.view") ? ["🧼", "Tepisi", summary.carpetCount, ""] : null,
         hasPermission("invoices.view") ? ["🧾", "Fakturisano", summary.invoicedCount, formatKm(summary.invoicedTotal) + " KM"] : null,
         hasPermission("orders.view") ? ["🚚", "Dostava", "", formatKm(summary.deliveryTotal) + " KM"] : null,
-        hasPermission("customers.view") ? ["👥", "Novi kupci", summary.newCustomerCount, ""] : null,
-    ].filter(Boolean);
 
-    return cards.length
-        ? cards.map(([icon, label, value, detail]) => `
-            <article class="dashboard-stat">
-                <span class="dashboard-stat-icon">${icon}</span>
-                <div>
-                    <small>${label}</small>
-                    <strong>${value === "" ? detail : value}</strong>
-                    ${value !== "" && detail ? `<span>${detail}</span>` : ""}
-                </div>
-            </article>
-        `).join("")
-        : '<div class="dashboard-loading">Nema dostupnih podataka za tvoje dozvole.</div>';
-}
-
-function dashboardWarningsContent(warnings) {
-    if (!warnings.length) {
-        return `
-            <div class="dashboard-ok">
-                <span>✅</span>
-                <div><strong>Sve je uredno</strong><small>Nema otvorenih upozorenja za provjerene podatke.</small></div>
-            </div>
-        `;
-    }
-
-    return warnings.map((warning) => `
-        <button class="dashboard-warning" data-warning-page="${escapeHtml(warning.page)}">
-            <span class="dashboard-warning-icon">⚠️</span>
-            <span>
-                <strong>${escapeHtml(warning.label)}</strong>
-                <small>${escapeHtml(warning.description)}</small>
-            </span>
-            <b>${warning.count} ›</b>
-        </button>
-    `).join("");
-}
 
 async function loadDashboard() {
     const summaryBox = document.getElementById("dashboard-summary");
@@ -335,7 +287,23 @@ async function loadDashboard() {
         `;
     }
 }
+function bindDashboard() {
+    document.querySelectorAll("[data-page-label]").forEach((button) => {
+        button.addEventListener("click", () => {
+            navigateByLabel(button.dataset.pageLabel);
+        });
+    });
 
+    document.getElementById("menu-toggle")?.addEventListener("click", openDrawer);
+    document.getElementById("user-menu")?.addEventListener("click", openUserMenu);
+
+    document.getElementById("modal-root")?.addEventListener(
+        "click",
+        handleModalClick,
+    );
+
+    navigate("home");
+}
 
 function formatKm(value) {
     return Number(value || 0).toFixed(2);
