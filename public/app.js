@@ -1,3 +1,5 @@
+const SC_HOME_SCREEN_STYLE = `.sc-home-app { min-height: 100vh; background: radial-gradient(circle at 10% 0%, rgba(113, 190, 255, .18), transparent 28%), radial-gradient(circle at 95% 92%, rgba(120, 184, 42, .13), transparent 26%), linear-gradient(135deg, #f7fbff 0%, #eef7ff 52%, #f7fbf7 100%); } .sc-app-header { height: 72px; padding: 8px 24px; border-bottom: 1px solid #e5eef7; box-shadow: 0 2px 14px rgba(19, 66, 110, .05); } .sc-header-logo img { width: 132px; height: 58px; object-fit: contain; display: block; } .sc-header-tools { display: flex; align-items: center; gap: 8px; } .sc-header-tool { width: 42px; height: 42px; border: 1px solid #e0ebf6; border-radius: 13px; background: #f3f8fd; color: #1559a8; font-size: 20px; } .sc-sidebar { position: fixed; z-index: 15; top: 72px; bottom: 0; left: 0; width: 220px; padding: 18px 10px; overflow-y: auto; border-right: 1px solid #e0ebf5; background: rgba(255, 255, 255, .94); backdrop-filter: blur(12px); } .sc-sidebar-brand { display: flex; justify-content: center; padding: 0 8px 18px; } .sc-sidebar-brand img { width: 150px; height: 72px; object-fit: contain; } .sc-sidebar-nav { display: grid; gap: 5px; } .sc-sidebar-item { width: 100%; min-height: 48px; display: grid; grid-template-columns: 30px 1fr; align-items: center; gap: 8px; padding: 7px 12px; border: 0; border-radius: 13px; background: transparent; color: #174d87; text-align: left; } .sc-sidebar-item span { font-size: 21px; text-align: center; } .sc-sidebar-item strong { font-size: 14px; } .sc-sidebar-item:hover, .sc-sidebar-item.active { background: #e5f3ff; color: #1169c4; } .sc-sidebar-divider { height: 1px; margin: 10px 12px; background: #e5edf5; } .sc-main-area { margin-left: 220px; min-height: calc(100vh - 72px); } .sc-desktop-toolbar { display: flex; align-items: center; justify-content: flex-end; gap: 14px; min-height: 64px; padding: 9px 28px; background: rgba(255, 255, 255, .72); } .sc-desktop-toolbar .mobile-search { width: min(265px, 30vw); margin: 0; } .sc-desktop-toolbar .quick-toolbar { position: static; display: flex; padding: 0; border: 0; background: transparent; backdrop-filter: none; } .sc-desktop-toolbar .quick-toolbar button { width: 42px; min-width: 42px; height: 42px; min-height: 42px; border-radius: 12px; background: #f2f8fd; } .sc-desktop-toolbar .quick-toolbar button span { display: none; } .sc-home-app #page-content { padding: 0; } .sc-home-page { width: min(1120px, calc(100% - 44px)); margin: 0 auto; padding: 20px 0 32px; } .sc-welcome { min-height: 245px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 24px 42px; border-radius: 30px; background: radial-gradient(circle at 75% 20%, rgba(82, 171, 255, .12), transparent 28%), linear-gradient(135deg, rgba(255,255,255,.96), rgba(239,248,255,.9)); overflow: hidden; } .sc-welcome-copy { padding-left: 6px; } .sc-welcome-eyebrow, .sc-main-menu-section > .sc-home-eyebrow { color: #1766ad; font-size: 14px; font-weight: 900; letter-spacing: .6px; } .sc-welcome h1 { margin: 5px 0 14px; color: #0c438c; font-size: clamp(40px, 5vw, 58px); line-height: 1; font-weight: 900; } .sc-role-badge { display: inline-flex; align-items: center; gap: 6px; padding: 8px 13px; border-radius: 999px; background: #e4f3ff; color: #1d70bb; font-size: 12px; font-weight: 900; } .sc-home-logo { width: 265px; height: 225px; object-fit: contain; flex: 0 0 auto; } .sc-home-new-order { width: 100%; min-height: 116px; display: grid; grid-template-columns: 76px 1fr auto; align-items: center; gap: 20px; margin: 18px 0 30px; padding: 18px 28px; border: 0; border-radius: 22px; background: linear-gradient(115deg, #1770cf, #3fa1f0); color: #fff; text-align: left; box-shadow: 0 14px 28px rgba(28, 113, 190, .22); } .sc-home-new-order-icon { width: 66px; height: 66px; display: grid; place-items: center; border-radius: 50%; background: #fff; color: #1670c9; font-size: 42px; line-height: 1; } .sc-home-new-order strong { display: block; font-size: 15px; letter-spacing: .3px; } .sc-home-new-order small { display: block; margin-top: 7px; font-size: 24px; font-weight: 800; } .sc-home-new-order b { font-size: 34px; font-weight: 400; } .sc-main-menu-section { padding: 0 4px; } .sc-main-menu-section h2 { margin: 5px 0 18px; color: #083f85; font-size: 32px; line-height: 1.05; font-weight: 900; } .sc-home-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; } .sc-home-card { min-height: 168px; display: grid; grid-template-columns: 56px 1fr; grid-template-rows: auto 1fr; align-items: start; column-gap: 12px; position: relative; padding: 18px; border: 1px solid #dcecf8; border-radius: 20px; background: rgba(255,255,255,.94); color: #114b89; text-align: left; box-shadow: 0 8px 24px rgba(20, 78, 126, .08); transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease; } .sc-home-card:hover { transform: translateY(-2px); border-color: #b9d9ef; box-shadow: 0 14px 30px rgba(20, 78, 126, .12); } .sc-home-card-icon { width: 54px; height: 54px; display: grid; place-items: center; grid-row: 1 / span 2; border-radius: 50%; background: #e8f6ff; color: #0878cf; font-size: 25px; } .sc-home-card-text strong { display: block; padding-top: 4px; color: #0e4c8f; font-size: 16px; font-weight: 900; } .sc-home-card-text small { display: block; margin-top: 7px; color: #5681aa; font-size: 11px; line-height: 1.3; font-weight: 700; } .sc-home-card-arrow { position: absolute; right: 16px; bottom: 12px; color: #1769b8; font-size: 24px; font-weight: 700; } .sc-home-footer { display: flex; justify-content: center; align-items: center; gap: 9px; padding: 30px 0 0; color: #1572c5; font-size: 19px; font-style: italic; } .sc-home-footer span { color: #77b82a; } .sc-mobile-search { display: none; } @media (max-width: 800px) { .sc-sidebar, .sc-desktop-toolbar { display: none; } .sc-main-area { margin-left: 0; } .sc-app-header { height: 62px; padding: 7px 12px; } .sc-header-logo img { width: 108px; height: 48px; } .sc-header-tools { gap: 5px; } .sc-header-tool { width: 38px; height: 38px; border-radius: 11px; } .sc-mobile-search { display: block; padding: 8px 12px 0; } .sc-mobile-search .mobile-search { margin: 0; min-height: 44px; } .sc-home-page { width: calc(100% - 20px); padding: 12px 0 92px; } .sc-welcome { min-height: 180px; padding: 14px 16px; border-radius: 24px; } .sc-welcome h1 { font-size: 34px; } .sc-welcome-eyebrow, .sc-main-menu-section > .sc-home-eyebrow { font-size: 11px; } .sc-home-logo { width: 150px; height: 150px; } .sc-home-new-order { min-height: 76px; grid-template-columns: 48px 1fr auto; gap: 11px; margin: 12px 0 20px; padding: 10px 13px; border-radius: 17px; } .sc-home-new-order-icon { width: 46px; height: 46px; font-size: 30px; } .sc-home-new-order small { font-size: 15px; margin-top: 3px; } .sc-home-new-order b { font-size: 25px; } .sc-main-menu-section h2 { margin-bottom: 12px; font-size: 22px; } .sc-home-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; } .sc-home-card { min-height: 112px; grid-template-columns: 42px 1fr; padding: 12px 10px; border-radius: 16px; } .sc-home-card-icon { width: 40px; height: 40px; font-size: 19px; } .sc-home-card-text strong { font-size: 13px; } .sc-home-card-text small { margin-top: 4px; font-size: 9px; } .sc-home-card-arrow { right: 10px; bottom: 7px; font-size: 18px; } .sc-home-footer { padding-top: 18px; font-size: 14px; } }`;
+
 const app = document.getElementById("app");
 
 const mainMenu = [
@@ -128,7 +130,20 @@ function loginView(error = "") {
 
 function dashboardView(user) {
   currentUser = user;
-  app.innerHTML = ` <div class="mobile-app sc-home-app"> <header class="mobile-header"> <button class="icon-button" id="menu-toggle" aria-label="Meni">☰</button> <div class="header-brand"> <strong>SUPER CLEAN</strong> <span>Banja Luka</span> </div> <button class="icon-button" id="user-menu" aria-label="Korisnik">👤</button> </header> <div class="mobile-search"> <span>🔎</span> <input id="global-search" placeholder="Pretraži..." aria-label="Pretraži"> </div> <div class="quick-toolbar" aria-label="Brze radnje"> <button data-action="add">➕<span>Dodaj</span></button> <button data-action="remove">🗑️<span>Ukloni</span></button> <button data-action="print">🖨️<span>Print</span></button> <button data-action="pdf">📄<span>PDF</span></button> <button data-action="search">🔎<span>Pretraga</span></button> <button id="more-actions">⋯<span>Više</span></button> </div> <main id="page-content">${homeContent()}</main> <nav class="bottom-nav"> <button data-page="home">🏠<span>Početna</span></button> ${ hasPermission("orders.view") ? '<button data-page="orders">📋<span>Narudžbe</span></button>' : "" } ${ hasPermission("customers.view") ? '<button data-page="customers">👥<span>Kupci</span></button>' : "" } ${ user.role === "ADMIN" ? '<button data-page="admin">⚙️<span>Admin</span></button>' : "" } </nav> <div id="drawer" class="drawer hidden"></div> <div id="modal-root"></div> <input id="excel-file" type="file" accept=".xlsx,.xls,.csv" class="hidden"> </div> `;
+
+  const sidebarItems = mainMenu
+    .filter(([, , , permission]) => hasPermission(permission))
+    .map(
+      ([icon, title]) => ` <button class="sc-sidebar-item${ title === "Nova narudžba" ? "" : "" }" type="button" data-page-label="${escapeHtml(title)}"> <span>${icon}</span> <strong>${escapeHtml(title)}</strong> </button> `
+    )
+    .join("");
+
+  const adminSidebar =
+    user.role === "ADMIN"
+      ? ` <div class="sc-sidebar-divider"></div> <button class="sc-sidebar-item" type="button" data-page-label="Administrator"> <span>⚙️</span> <strong>Administrator</strong> </button> `
+      : "";
+
+  app.innerHTML = ` <style>${SC_HOME_SCREEN_STYLE}</style> <div class="mobile-app sc-home-app"> <header class="mobile-header sc-app-header"> <button class="icon-button" id="menu-toggle" aria-label="Meni">☰</button> <div class="sc-header-logo"> <img src="/logo-login.png" alt="Super Clean"> </div> <div class="sc-header-tools"> <button class="sc-header-tool" type="button" data-action="search" aria-label="Pretraga">⌕</button> <button class="sc-header-tool" type="button" id="user-menu" aria-label="Korisnik">👤</button> </div> </header> <aside class="sc-sidebar" aria-label="Glavni meni"> <div class="sc-sidebar-brand"> <img src="/logo-login.png" alt="Super Clean"> </div> <nav class="sc-sidebar-nav"> <button class="sc-sidebar-item active" type="button" data-page="home"> <span>🏠</span> <strong>Početna</strong> </button> ${sidebarItems} ${adminSidebar} </nav> </aside> <div class="sc-main-area"> <div class="sc-desktop-toolbar"> <div class="mobile-search"> <span>🔎</span> <input id="global-search" placeholder="Pretraži..." aria-label="Pretraži"> </div> <div class="quick-toolbar" aria-label="Brze radnje"> <button data-action="add">➕<span>Dodaj</span></button> <button data-action="remove">🗑️<span>Ukloni</span></button> <button data-action="print">🖨️<span>Print</span></button> <button data-action="pdf">📄<span>PDF</span></button> <button data-action="search">🔎<span>Pretraga</span></button> <button id="more-actions">⋯<span>Više</span></button> </div> </div> <main id="page-content">${homeContent()}</main> </div> <div class="sc-mobile-search"> <div class="mobile-search"> <span>🔎</span> <input id="global-search-mobile" placeholder="Pretraži..." aria-label="Pretraži"> </div> </div> <nav class="bottom-nav"> <button data-page="home">🏠<span>Početna</span></button> ${ hasPermission("orders.view") ? '<button data-page="orders">📋<span>Narudžbe</span></button>' : "" } ${ hasPermission("customers.view") ? '<button data-page="customers">👥<span>Kupci</span></button>' : "" } ${ user.role === "ADMIN" ? '<button data-page="admin">⚙️<span>Admin</span></button>' : "" } </nav> <div id="drawer" class="drawer hidden"></div> <div id="modal-root"></div> <input id="excel-file" type="file" accept=".xlsx,.xls,.csv" class="hidden"> </div> `;
 
   bindDashboard();
   loadDashboard();
@@ -141,7 +156,8 @@ function homeContent() {
       icon,
       title,
       description,
-    }));
+    }))
+    .filter((item) => item.title !== "Nova narudžba");
 
   if (currentUser.role === "ADMIN") {
     menuItems.push({
@@ -153,11 +169,14 @@ function homeContent() {
 
   const cards = menuItems
     .map(
-      (item) => ` <button class="sc-home-card" type="button" data-page-label="${escapeHtml(item.title)}" > <span class="sc-home-card-icon">${item.icon}</span> <span class="sc-home-card-text"> <strong>${escapeHtml(item.title)}</strong> <small>${escapeHtml(item.description)}</small> </span> <span class="sc-home-card-arrow" aria-hidden="true">›</span> </button> `
+      (item) => ` <button class="sc-home-card" type="button" data-page-label="${escapeHtml(item.title)}" > <span class="sc-home-card-icon">${item.icon}</span> <span class="sc-home-card-text"> <strong>${escapeHtml(item.title)}</strong> <small>${escapeHtml(item.description)}</small> </span> <span class="sc-home-card-arrow" aria-hidden="true">→</span> </button> `
     )
     .join("");
 
-  return ` <section class="sc-home-hero"> <img class="sc-home-logo" src="/logo-login.png" alt="Super Clean" > <h1>Super Clean</h1> <p>Banja Luka · poslovna aplikacija</p> </section> <section class="sc-home-panel"> <div class="sc-home-panel-heading"> <div> <span class="sc-home-eyebrow">GLAVNI MENI</span> <h2>Šta želiš otvoriti?</h2> </div> <span class="sc-home-user"> ${escapeHtml(currentUser.firstName || "")} </span> </div> <button class="sc-home-new-order" type="button" data-page-label="Nova narudžba" > <span class="sc-home-new-order-icon">➕</span> <span> <strong>NOVA NARUDŽBA</strong> <small>Brz prijem novog tepiha</small> </span> <b aria-hidden="true">→</b> </button> <div class="sc-home-grid"> ${cards} </div> </section> <footer class="sc-home-footer"> <span>Čisto</span> <b>•</b> <span>Brzo</span> <b>•</b> <span>Profesionalno</span> </footer> `;
+  const roleLabel = currentUser.role === "ADMIN" ? "ADMINISTRATOR" : "KORISNIK";
+  const firstName = escapeHtml(currentUser.firstName || "Korisnik");
+
+  return ` <div class="sc-home-page"> <section class="sc-welcome"> <div class="sc-welcome-copy"> <span class="sc-welcome-eyebrow">DOBRO DOŠAO</span> <h1>${firstName} 👋</h1> <span class="sc-role-badge">🛡️ ${roleLabel}</span> </div> <img class="sc-home-logo" src="/logo-login.png" alt="Super Clean Banja Luka" > </section> <button class="sc-home-new-order" type="button" data-page-label="Nova narudžba" > <span class="sc-home-new-order-icon">+</span> <span> <strong>NOVA NARUDŽBA</strong> <small>Brz prijem novog tepiha</small> </span> <b aria-hidden="true">→</b> </button> <section class="sc-main-menu-section"> <span class="sc-home-eyebrow">GLAVNI MENI</span> <h2>Šta želiš otvoriti?</h2> <div class="sc-home-grid"> ${cards} </div> </section> <footer class="sc-home-footer"> <strong>Čist dom</strong> <span>•</span> <strong>Zdraviji život</strong> </footer> </div> `;
 }
 
 function dashboardSummaryContent(summary) {
@@ -1541,22 +1560,24 @@ function bindDashboard() {
 
   document
     .getElementById("more-actions")
-    .addEventListener("click", openMoreActions);
-  document.getElementById("menu-toggle").addEventListener("click", openDrawer);
-  document.getElementById("user-menu").addEventListener("click", openUserMenu);
+    ?.addEventListener("click", openMoreActions);
+  document.getElementById("menu-toggle")?.addEventListener("click", openDrawer);
+  document.getElementById("user-menu")?.addEventListener("click", openUserMenu);
+
   document
     .getElementById("global-search")
-    .addEventListener("keydown", (event) => {
+    ?.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         const firstResult = document.querySelector(".global-search-result");
         if (firstResult) firstResult.click();
       }
     });
+
   bindGlobalSearch();
 
   document
     .getElementById("modal-root")
-    .addEventListener("click", handleModalClick);
+    ?.addEventListener("click", handleModalClick);
   navigate("home");
 }
 
