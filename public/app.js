@@ -76,75 +76,6 @@ function hasPermission(code) {
     return currentUser?.role === "ADMIN" || currentUser?.permissions?.includes(code);
 }
 
-function loginView(error = "") {
-    app.innerHTML = `
-        <main class="login-page">
-            <section class="login-card">
-                <img class="login-logo" src="/logo.jpg" alt="Super Clean logo">
-                <h1>Super Clean</h1>
-                <p>Banja Luka · poslovna aplikacija</p>
-                <div id="login-error" class="${error ? "error" : "error hidden"}">${escapeHtml(error)}</div>
-                <form id="login-form">
-                    <label>Korisničko ime
-                        <input name="username" autocomplete="username" required autofocus>
-                    </label>
-                    <label>Lozinka
-                        <input name="password" type="password" autocomplete="current-password" required>
-                    </label>
-                    <button class="primary-button" id="login-button">Prijavi se</button>
-                </form>
-            </section>
-        </main>
-    `;
-    document.getElementById("login-form").addEventListener("submit", handleLogin);
-}
-
-function dashboardView(user) {
-    currentUser = user;
-    app.innerHTML = `
-        <div class="mobile-app">
-            <header class="mobile-header">
-                <button class="icon-button" id="menu-toggle" aria-label="Meni">☰</button>
-                <div class="header-brand">
-                    <strong>SUPER CLEAN</strong>
-                    <span>Banja Luka</span>
-                </div>
-                <button class="icon-button" id="user-menu" aria-label="Korisnik">👤</button>
-            </header>
-
-            <div class="mobile-search">
-                <span>🔎</span>
-                <input id="global-search" placeholder="Pretraži..." aria-label="Pretraži">
-            </div>
-
-            <div class="quick-toolbar" aria-label="Brze radnje">
-                <button data-action="add">➕<span>Dodaj</span></button>
-                <button data-action="remove">🗑️<span>Ukloni</span></button>
-                <button data-action="print">🖨️<span>Print</span></button>
-                <button data-action="pdf">📄<span>PDF</span></button>
-                <button data-action="search">🔎<span>Pretraga</span></button>
-                <button id="more-actions">⋯<span>Više</span></button>
-            </div>
-
-            <main id="page-content">${homeContent()}</main>
-
-            <nav class="bottom-nav">
-                <button data-page="home">🏠<span>Početna</span></button>
-                ${hasPermission("orders.view") ? '<button data-page="orders">📋<span>Narudžbe</span></button>' : ""}
-                ${hasPermission("customers.view") ? '<button data-page="customers">👥<span>Kupci</span></button>' : ""}
-                ${user.role === "ADMIN" ? '<button data-page="admin">⚙️<span>Admin</span></button>' : ""}
-            </nav>
-
-            <div id="drawer" class="drawer hidden"></div>
-            <div id="modal-root"></div>
-            <input id="excel-file" type="file" accept=".xlsx,.xls,.csv" class="hidden">
-        </div>
-    `;
-
-    bindDashboard();
-    loadDashboard();
-}
-
 function homeContent() {
     const cards = mainMenu
         .filter(([, , , permission]) => hasPermission(permission))
@@ -200,6 +131,136 @@ function homeContent() {
     `;
 }
 
+function loginView(error = "") {
+    app.innerHTML = `
+        <main class="login-page">
+            <section class="login-card">
+                <img class="login-logo" src="/logo.jpg" alt="Super Clean logo">
+
+                <div class="login-brand">
+                    <h1>Super Clean</h1>
+                    <p>Banja Luka · poslovna aplikacija</p>
+                </div>
+
+                <div id="login-error" class="${error ? "error" : "error hidden"}">${escapeHtml(error)}</div>
+
+                <form id="login-form" novalidate>
+                    <label class="login-field">
+                        <span>Korisničko ime</span>
+                        <div class="login-input-wrap">
+                            <span class="login-field-icon" aria-hidden="true">👤</span>
+                            <input
+                                name="username"
+                                autocomplete="username"
+                                placeholder="Unesite korisničko ime"
+                                required
+                                autofocus
+                            >
+                        </div>
+                    </label>
+
+                    <label class="login-field">
+                        <span>Šifra</span>
+                        <div class="login-input-wrap">
+                            <span class="login-field-icon" aria-hidden="true">🔒</span>
+                            <input
+                                id="login-password"
+                                name="password"
+                                type="password"
+                                autocomplete="current-password"
+                                placeholder="Unesite šifru"
+                                required
+                            >
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                id="password-toggle"
+                                aria-label="Prikaži šifru"
+                                aria-pressed="false"
+                            >👁</button>
+                        </div>
+                    </label>
+
+                    <div class="login-options">
+                        <span class="login-session-note">🔐 Sigurna prijava</span>
+                        <button type="button" class="change-user-button" id="change-user-button">
+                            ⚙ Promijeni korisnika
+                        </button>
+                    </div>
+
+                    <button class="primary-button login-submit-button" id="login-button" type="submit">
+                        PRIJAVI SE <span aria-hidden="true">→</span>
+                    </button>
+                </form>
+
+                <div class="login-footer">Čisto · Brzo · Profesionalno</div>
+            </section>
+        </main>
+    `;
+
+    document.getElementById("login-form").addEventListener("submit", handleLogin);
+
+    document.getElementById("password-toggle").addEventListener("click", () => {
+        const passwordInput = document.getElementById("login-password");
+        const toggle = document.getElementById("password-toggle");
+        const visible = passwordInput.type === "text";
+
+        passwordInput.type = visible ? "password" : "text";
+        toggle.textContent = visible ? "👁" : "🙈";
+        toggle.setAttribute(
+            "aria-label",
+            visible ? "Prikaži šifru" : "Sakrij šifru"
+        );
+        toggle.setAttribute("aria-pressed", String(!visible));
+    });
+
+    document.getElementById("change-user-button").addEventListener("click", logout);
+}
+function dashboardView(user) {
+    currentUser = user;
+    app.innerHTML = `
+        <div class="mobile-app">
+            <header class="mobile-header">
+                <button class="icon-button" id="menu-toggle" aria-label="Meni">☰</button>
+                <div class="header-brand">
+                    <strong>SUPER CLEAN</strong>
+                    <span>Banja Luka</span>
+                </div>
+                <button class="icon-button" id="user-menu" aria-label="Korisnik">👤</button>
+            </header>
+
+            <div class="mobile-search">
+                <span>🔎</span>
+                <input id="global-search" placeholder="Pretraži..." aria-label="Pretraži">
+            </div>
+
+            <div class="quick-toolbar" aria-label="Brze radnje">
+                <button data-action="add">➕<span>Dodaj</span></button>
+                <button data-action="remove">🗑️<span>Ukloni</span></button>
+                <button data-action="print">🖨️<span>Print</span></button>
+                <button data-action="pdf">📄<span>PDF</span></button>
+                <button data-action="search">🔎<span>Pretraga</span></button>
+                <button id="more-actions">⋯<span>Više</span></button>
+            </div>
+
+            <main id="page-content">${homeContent()}</main>
+
+            <nav class="bottom-nav">
+                <button data-page="home">🏠<span>Početna</span></button>
+                ${hasPermission("orders.view") ? '<button data-page="orders">📋<span>Narudžbe</span></button>' : ""}
+                ${hasPermission("customers.view") ? '<button data-page="customers">👥<span>Kupci</span></button>' : ""}
+                ${user.role === "ADMIN" ? '<button data-page="admin">⚙️<span>Admin</span></button>' : ""}
+            </nav>
+
+            <div id="drawer" class="drawer hidden"></div>
+            <div id="modal-root"></div>
+            <input id="excel-file" type="file" accept=".xlsx,.xls,.csv" class="hidden">
+        </div>
+    `;
+
+    bindDashboard();
+    loadDashboard();
+}
 function dashboardSummaryContent(summary) {
     const cards = [
         hasPermission("orders.view") ? ["📋", "Narudžbe", summary.orderCount, ""] : null,
