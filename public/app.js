@@ -179,6 +179,7 @@ function loginView(error = "") {
 
 function dashboardView(user) {
   currentUser = user;
+
   const sidebarItems = mainMenu
     .filter(([, , , permission]) => hasPermission(permission))
     .map(([icon, title, description]) => ({
@@ -400,4 +401,4 @@ function invoiceContent(order, items) {
       ? ` <tr> <td>${ items.length + 1 }</td> <td><strong>Dostava</strong></td> <td>—</td> <td class="text-right">1</td> <td>usl.</td> <td class="text-right">${formatKm( deliveryPrice )} KM</td> <td class="text-right"><strong>${formatKm( deliveryPrice )} KM</strong></td> </tr> `
       : "";
 
-  return ` <section class="invoice-page"> <div class="invoice-toolbar no-print"> <button class="back-button" data-go-invoice-list>← Račun
+  return ` <section class="invoice-page"> <div class="invoice-toolbar no-print"> <button class="back-button" data-go-invoice-list>← Raču
