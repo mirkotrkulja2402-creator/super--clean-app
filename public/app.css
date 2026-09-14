@@ -4869,71 +4869,289 @@ body {
   }
 }
 
-/* Super Clean reference UI stability */
+/* Super Clean login stability override */
 html,
 body,
 #app {
   width: 100%;
-  max-width: 100%;
   min-width: 0;
+  max-width: 100%;
   margin: 0;
+  padding: 0;
   overflow-x: hidden;
 }
 
 body {
-  min-width: 0;
+  min-height: 100vh;
 }
 
-img,
-svg,
-video,
-canvas {
-  max-width: 100%;
-}
-
-button,
-input,
-select,
-textarea {
-  max-width: 100%;
-}
-
-.login-error {
-  margin: 0 0 14px;
-}
-
-.sc-reference-app,
 .sc-reference-login,
-.sc-layout,
-.sc-main,
-.sc-home-hero,
-.sc-home-grid,
-.sc-home-card {
-  min-width: 0;
-  max-width: 100%;
+.sc-reference-login * {
+  box-sizing: border-box;
 }
 
-.sc-main {
+.sc-reference-login {
+  width: 100%;
+  min-height: 100dvh;
+  padding: 20px 14px 24px;
   overflow-x: hidden;
 }
 
-.sc-home-hero-logo {
+.sc-reference-login-card {
+  width: min(620px, 100%);
+  max-width: 100%;
+  padding: 20px 20px 18px;
+  overflow: hidden;
+}
+
+.sc-reference-login-brand {
+  width: 100%;
+  min-width: 0;
+}
+
+.sc-reference-login-logo {
+  width: min(180px, 52vw);
+  height: 165px;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center;
+  margin: -4px auto 2px;
+}
+
+.sc-reference-login-brand h1 {
+  font-size: clamp(34px, 8vw, 48px);
+  line-height: 1.02;
+}
+
+.sc-reference-login-brand p {
+  margin: 7px 0 18px;
+  font-size: clamp(15px, 4vw, 19px);
+}
+
+.sc-reference-login-form {
+  width: 100%;
+  max-width: 100%;
+  padding: 20px 18px 16px;
+  overflow: hidden;
+}
+
+.sc-reference-field {
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 17px;
+}
+
+.sc-reference-field-label {
+  font-size: 16px;
+}
+
+.sc-reference-field-label svg {
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px;
+  min-height: 24px;
+  max-width: 24px;
+  max-height: 24px;
+  flex: 0 0 24px;
+}
+
+.sc-reference-input-wrap {
+  width: 100%;
+  min-width: 0;
+}
+
+.sc-reference-input-wrap input {
+  width: 100%;
+  max-width: 100%;
+  height: 60px;
+  min-height: 60px;
+  font-size: 17px;
+}
+
+.sc-reference-password-toggle {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.sc-reference-password-toggle svg {
+  width: 25px !important;
+  height: 25px !important;
+  min-width: 25px;
+  min-height: 25px;
+  max-width: 25px;
+  max-height: 25px;
+}
+
+.sc-reference-login-options {
+  width: 100%;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 14px;
+  margin: 3px 0 18px;
+  font-size: 14px;
+}
+
+.sc-remember {
+  min-width: 0;
+  flex: 1 1 210px;
+}
+
+.sc-remember-mark {
+  flex: 0 0 24px;
+}
+
+.sc-change-user {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  flex: 0 1 auto;
+  max-width: 100%;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.sc-change-user svg {
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px;
+  min-height: 24px;
+  max-width: 24px;
+  max-height: 24px;
+  flex: 0 0 24px;
+}
+
+.sc-reference-login-submit {
+  width: 100%;
+  max-width: 100%;
+  min-height: 64px;
+  height: 64px;
+  font-size: 20px;
+}
+
+.sc-reference-secure {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 12px;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.sc-reference-secure svg {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px;
+  min-height: 42px;
+  max-width: 42px;
+  max-height: 42px;
+  flex: 0 0 42px;
+}
+
+.sc-reference-login-footer {
+  margin-top: 14px;
+  font-size: 16px;
+}
+
+.sc-reference-login svg {
   max-width: 100%;
 }
 
-@media (max-width: 800px) {
-  .sc-main {
-    width: 100%;
-    padding-left: 16px;
-    padding-right: 16px;
+@media (max-width: 460px) {
+  .sc-reference-login {
+    padding: 10px 10px 18px;
+    place-items: start center;
   }
 
-  .sc-home-hero {
-    width: calc(100% + 32px);
-    max-width: none;
+  .sc-reference-login-card {
+    width: 100%;
+    padding: 14px 10px 16px;
+    border-radius: 20px;
   }
 
-  .sc-home-grid {
-    width: 100%;
+  .sc-reference-login-logo {
+    width: 165px;
+    height: 145px;
+    margin: -2px auto 0;
+  }
+
+  .sc-reference-login-brand h1 {
+    font-size: 34px;
+  }
+
+  .sc-reference-login-brand p {
+    margin: 6px 0 16px;
+    font-size: 16px;
+  }
+
+  .sc-reference-login-form {
+    padding: 17px 11px 14px;
+    border-radius: 17px;
+  }
+
+  .sc-reference-field-label {
+    font-size: 15px;
+  }
+
+  .sc-reference-input-wrap input {
+    height: 58px;
+    min-height: 58px;
+    padding-left: 18px;
+    padding-right: 48px;
+  }
+
+  .sc-reference-login-options {
+    flex-wrap: nowrap;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .sc-remember {
+    flex: 1 1 auto;
+    gap: 7px;
+  }
+
+  .sc-change-user {
+    flex: 0 0 auto;
+    font-size: 12px;
+    gap: 5px;
+  }
+
+  .sc-change-user svg {
+    width: 23px !important;
+    height: 23px !important;
+    min-width: 23px;
+    min-height: 23px;
+    max-width: 23px;
+    max-height: 23px;
+    flex-basis: 23px;
+  }
+
+  .sc-reference-login-submit {
+    height: 62px;
+    min-height: 62px;
+    font-size: 19px;
+  }
+
+  .sc-reference-secure {
+    min-height: 44px;
+    font-size: 13px;
+  }
+
+  .sc-reference-secure svg {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px;
+    min-height: 38px;
+    max-width: 38px;
+    max-height: 38px;
+    flex-basis: 38px;
+  }
+
+  .sc-reference-login-footer {
+    font-size: 15px;
   }
 }
