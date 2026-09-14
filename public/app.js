@@ -102,159 +102,168 @@ function hasPermission(code) {
   );
 }
 
+const SC_REFERENCE_STYLE_ID = "sc-reference-ui-style";
+
+function ensureReferenceStyles() {
+  if (document.getElementById(SC_REFERENCE_STYLE_ID)) return;
+
+  const style = document.createElement("style");
+  style.id = SC_REFERENCE_STYLE_ID;
+  style.textContent = ` :root { --sc-blue: #075fbd; --sc-blue-dark: #08458e; --sc-blue-bright: #238fe6; --sc-green: #78bd36; --sc-sky: #eef8ff; --sc-line: #d8e9f6; --sc-text: #12457f; --sc-muted: #7894ae; --sc-white: #ffffff; --sc-shadow: 0 14px 34px rgba(25, 105, 170, .10); } html, body, #app { min-height: 100%; } body { overflow-x: hidden; } .sc-reference-app { min-height: 100vh; width: 100%; background: radial-gradient(circle at 82% 10%, rgba(164, 224, 255, .34), transparent 27%), radial-gradient(circle at 16% 90%, rgba(157, 226, 119, .20), transparent 24%), #f5fbff; color: var(--sc-text); } .sc-reference-app *, .sc-reference-app *::before, .sc-reference-app *::after, .sc-reference-login *, .sc-reference-login *::before, .sc-reference-login *::after { box-sizing: border-box; } .sc-app-header { position: sticky; top: 0; z-index: 50; height: 76px; display: grid; grid-template-columns: 245px minmax(300px, 1fr) auto; align-items: center; gap: 24px; padding: 0 24px; background: rgba(255,255,255,.97); border-bottom: 1px solid #e3eef6; box-shadow: 0 2px 12px rgba(20, 80, 130, .06); } .sc-header-brand { display: flex; align-items: center; gap: 13px; min-width: 0; } .sc-header-brand img { width: 168px; height: 60px; object-fit: contain; object-position: left center; display: block; } .sc-header-search { width: min(420px, 100%); justify-self: center; position: relative; } .sc-header-search input { width: 100%; height: 46px; border: 1px solid #dceaf5; border-radius: 14px; padding: 0 18px 0 46px; background: #f0f7fd; color: #244e78; font-size: 16px; outline: none; } .sc-header-search input:focus { border-color: #8fc6ee; box-shadow: 0 0 0 3px rgba(35,143,230,.12); } .sc-header-search .sc-search-icon { position: absolute; left: 17px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--sc-blue); pointer-events: none; } .sc-header-actions { display: flex; align-items: center; gap: 8px; } .sc-header-action { width: 42px; height: 42px; border: 1px solid #e0edf7; border-radius: 13px; background: #f2f8fd; color: var(--sc-blue); display: grid; place-items: center; cursor: pointer; } .sc-header-action svg { width: 20px; height: 20px; } .sc-user-button { display: flex; align-items: center; gap: 9px; height: 48px; padding: 4px 12px 4px 5px; border: 0; background: transparent; color: var(--sc-text); font-weight: 700; cursor: pointer; } .sc-user-avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: #edf7ff; border: 1px solid #cde3f4; } .sc-user-avatar svg { width: 23px; height: 23px; color: var(--sc-blue); } .sc-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); min-height: calc(100vh - 76px); } .sc-sidebar { position: sticky; top: 76px; height: calc(100vh - 76px); padding: 18px 10px; background: rgba(255,255,255,.94); border-right: 1px solid #e0edf6; overflow-y: auto; } .sc-sidebar-list { display: grid; gap: 4px; } .sc-sidebar-item { width: 100%; min-height: 50px; border: 0; border-radius: 12px; background: transparent; color: #24588d; display: flex; align-items: center; gap: 13px; padding: 10px 14px; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer; } .sc-sidebar-item:hover { background: #f1f8fd; } .sc-sidebar-item.active { background: #e1f2ff; color: var(--sc-blue); font-weight: 800; } .sc-sidebar-item svg { width: 23px; height: 23px; flex: 0 0 23px; } .sc-sidebar-separator { height: 1px; margin: 13px 10px; background: #e3eef5; } .sc-main { min-width: 0; padding: 0 22px 28px; overflow: hidden; } .sc-mobile-tools { display: none; } .sc-home-hero { position: relative; min-height: 260px; margin: 0 -22px; padding: 38px 52px 30px; display: grid; grid-template-columns: minmax(0, 1fr) 330px; align-items: center; overflow: hidden; background: radial-gradient(ellipse at 78% 32%, rgba(255,255,255,.95) 0 19%, transparent 20%), linear-gradient(155deg, #f7fcff 0%, #e7f6ff 58%, #f5fcf9 100%); } .sc-home-hero::before, .sc-home-hero::after { content: ""; position: absolute; pointer-events: none; border-radius: 50%; border: 20px solid rgba(80, 164, 231, .12); } .sc-home-hero::before { width: 760px; height: 310px; left: -220px; bottom: -245px; transform: rotate(-7deg); } .sc-home-hero::after { width: 900px; height: 330px; right: -400px; top: -250px; border-color: rgba(117, 190, 59, .10); } .sc-home-welcome { position: relative; z-index: 2; } .sc-home-eyebrow { display: block; margin-bottom: 3px; color: var(--sc-blue); font-size: 15px; line-height: 1.2; font-weight: 800; letter-spacing: .05em; } .sc-home-welcome h1 { margin: 0; color: #064b98; font-size: clamp(42px, 4vw, 58px); line-height: 1.03; font-weight: 900; letter-spacing: -.04em; } .sc-role-badge { display: inline-flex; align-items: center; gap: 7px; margin-top: 13px; padding: 8px 14px; border-radius: 999px; background: #dff1ff; color: #1770b9; font-size: 14px; font-weight: 800; } .sc-home-hero-logo { position: relative; z-index: 2; justify-self: end; width: 285px; height: 225px; object-fit: contain; display: block; } .sc-new-order { position: relative; z-index: 3; width: 100%; min-height: 112px; margin: 20px 0 30px; border: 0; border-radius: 16px; padding: 18px 28px; background: linear-gradient(110deg, #1179d1 0%, #4aabef 100%); color: white; display: grid; grid-template-columns: 74px minmax(0,1fr) 48px; align-items: center; gap: 20px; text-align: left; box-shadow: 0 14px 28px rgba(19, 119, 207, .20); cursor: pointer; overflow: hidden; } .sc-new-order::after { content: ""; position: absolute; width: 430px; height: 180px; right: -120px; top: -70px; border: 2px solid rgba(255,255,255,.13); border-radius: 50%; transform: rotate(-8deg); } .sc-new-order-icon { width: 68px; height: 68px; border-radius: 50%; background: white; color: var(--sc-blue); display: grid; place-items: center; font-size: 34px; font-weight: 400; position: relative; z-index: 1; } .sc-new-order-text, .sc-new-order-arrow { position: relative; z-index: 1; } .sc-new-order-text strong { display: block; font-size: 15px; letter-spacing: .04em; } .sc-new-order-text span { display: block; margin-top: 5px; font-size: 24px; line-height: 1.15; font-weight: 800; } .sc-new-order-arrow { justify-self: end; font-size: 34px; font-weight: 300; } .sc-menu-heading { margin: 0 0 18px; } .sc-menu-heading h2 { margin: 2px 0 0; color: #08488f; font-size: 30px; line-height: 1.1; font-weight: 900; letter-spacing: -.025em; } .sc-home-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; } .sc-home-card { min-height: 178px; padding: 19px 20px 16px; border: 1px solid #d8eaf6; border-radius: 16px; background: rgba(255,255,255,.96); color: var(--sc-text); display: flex; flex-direction: column; align-items: flex-start; text-align: left; box-shadow: 0 7px 20px rgba(30, 113, 169, .07); cursor: pointer; transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; } .sc-home-card:hover { transform: translateY(-2px); border-color: #b7d8ee; box-shadow: 0 12px 24px rgba(30, 113, 169, .11); } .sc-home-card-icon { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: #eaf7ff; color: #0876c9; border: 1px solid #d0ebf8; margin-bottom: 17px; } .sc-home-card-icon svg { width: 26px; height: 26px; } .sc-home-card strong { display: block; color: #0a4d91; font-size: 17px; line-height: 1.2; font-weight: 850; } .sc-home-card small { display: block; margin-top: 7px; color: #7592ad; font-size: 13px; line-height: 1.3; } .sc-home-card-arrow { margin-top: auto; margin-left: auto; color: #1674bb; font-size: 25px; line-height: 1; } .sc-home-footer { display: flex; justify-content: center; gap: 9px; padding: 26px 0 8px; color: #1972c1; font-size: 18px; font-style: italic; } .sc-home-footer b { color: var(--sc-green); } .sc-mobile-bottom { display: none; } .sc-reference-login { min-height: 100vh; display: grid; place-items: center; padding: 42px 20px; position: relative; overflow: hidden; background: radial-gradient(ellipse at 20% 25%, rgba(255,255,255,.95) 0 12%, transparent 13%), linear-gradient(145deg, #f6fcff 0%, #eaf7ff 60%, #f8fcf7 100%); } .sc-reference-login::before, .sc-reference-login::after { content: ""; position: absolute; width: 120%; height: 220px; left: -10%; border-radius: 50%; border: 22px solid rgba(44, 145, 220, .10); transform: rotate(-8deg); pointer-events: none; } .sc-reference-login::before { top: -150px; } .sc-reference-login::after { bottom: -150px; border-color: rgba(117, 190, 59, .14); } .sc-reference-login-card { position: relative; z-index: 1; width: min(760px, 100%); padding: 28px 36px 30px; border: 1px solid #d9e8f3; border-radius: 24px; background: rgba(255,255,255,.96); box-shadow: 0 18px 55px rgba(40, 105, 150, .13); } .sc-reference-login-brand { text-align: center; } .sc-reference-login-logo { width: 220px; height: 205px; object-fit: contain; display: block; margin: -8px auto 2px; } .sc-reference-login-brand h1 { margin: 0; color: #073f82; font-size: clamp(38px, 5vw, 58px); line-height: 1; font-weight: 900; letter-spacing: -.035em; } .sc-reference-login-brand p { margin: 10px 0 28px; color: #70ad45; font-size: 21px; font-weight: 600; } .sc-reference-login-form { padding: 26px 30px 20px; border: 1px solid #e0edf6; border-radius: 18px; background: rgba(255,255,255,.97); } .sc-reference-field { display: block; margin-bottom: 20px; } .sc-reference-field-label { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; color: #164a82; font-size: 17px; font-weight: 800; } .sc-reference-field-label svg { width: 24px; height: 24px; color: #12558f; } .sc-reference-input-wrap { position: relative; } .sc-reference-input-wrap input { width: 100%; height: 64px; border: 2px solid #d8e7f1; border-radius: 14px; padding: 0 52px 0 22px; color: #214b72; background: #fff; font-size: 18px; outline: none; } .sc-reference-input-wrap input:focus { border-color: #247bc3; box-shadow: 0 0 0 4px rgba(36,123,195,.10); } .sc-reference-input-wrap input::placeholder { color: #a1b3c4; } .sc-reference-password-toggle { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border: 0; background: transparent; color: #15528c; display: grid; place-items: center; cursor: pointer; } .sc-reference-password-toggle svg { width: 25px; height: 25px; } .sc-reference-login-options { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 2px 0 18px; color: #5f82a4; font-size: 15px; } .sc-remember { display: flex; align-items: center; gap: 9px; } .sc-remember-mark { width: 24px; height: 24px; border-radius: 5px; background: #1672ca; color: white; display: grid; place-items: center; font-size: 16px; font-weight: 900; } .sc-change-user { border: 0; background: transparent; color: #146dc0; font-size: 15px; font-weight: 700; cursor: pointer; padding: 5px 0; } .sc-reference-login-submit { width: 100%; min-height: 72px; border: 0; border-radius: 14px; background: linear-gradient(100deg, #0756b2, #1677cf); color: white; font-size: 22px; font-weight: 900; letter-spacing: .02em; cursor: pointer; box-shadow: 0 10px 22px rgba(12, 92, 178, .18); } .sc-reference-secure { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 15px; color: #6590b5; font-size: 15px; } .sc-reference-login-footer { margin-top: 18px; text-align: center; color: #1672c1; font-size: 17px; font-style: italic; } @media (max-width: 1100px) { .sc-home-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .sc-app-header { grid-template-columns: 205px minmax(260px,1fr) auto; gap: 14px; padding: 0 16px; } .sc-header-brand img { width: 145px; } .sc-layout { grid-template-columns: 195px minmax(0,1fr); } .sc-home-hero { grid-template-columns: minmax(0,1fr) 270px; padding-left: 38px; padding-right: 38px; } } @media (max-width: 800px) { .sc-reference-app { min-height: 100dvh; background: #f3faff; } .sc-app-header { position: sticky; top: 0; height: 72px; display: grid; grid-template-columns: 46px minmax(0,1fr) 46px; gap: 6px; padding: 0 10px; } .sc-header-menu-button, .sc-header-user-button { width: 42px; height: 42px; border: 1px solid #d9e8f3; border-radius: 12px; background: #f5faff; color: var(--sc-blue); display: grid; place-items: center; cursor: pointer; } .sc-header-menu-button svg, .sc-header-user-button svg { width: 24px; height: 24px; } .sc-header-brand { justify-content: center; } .sc-header-brand img { width: 150px; height: 58px; object-position: center; } .sc-header-search, .sc-header-actions, .sc-sidebar { display: none; } .sc-layout { display: block; min-height: auto; } .sc-main { padding: 0 16px 92px; } .sc-mobile-tools { display: block; } .sc-mobile-search { position: relative; margin: 16px 4px 10px; } .sc-mobile-search input { width: 100%; height: 70px; border: 1px solid #d8e8f3; border-radius: 22px; padding: 0 18px 0 56px; background: rgba(255,255,255,.86); color: #315875; font-size: 20px; outline: none; box-shadow: 0 3px 10px rgba(42, 111, 159, .04); } .sc-mobile-search .sc-search-icon { position: absolute; left: 22px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; color: var(--sc-blue); pointer-events: none; } .sc-mobile-toolbar { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 10px; margin: 0 4px 12px; } .sc-mobile-toolbar button { min-width: 0; height: 70px; border: 1px solid #dbeaf4; border-radius: 20px; background: #f2f9fe; color: #1264a9; display: grid; place-items: center; cursor: pointer; } .sc-mobile-toolbar svg { width: 27px; height: 27px; } .sc-mobile-toolbar button span { display: none; } .sc-home-hero { min-height: 250px; margin: 0 -16px; padding: 30px 22px 20px; grid-template-columns: minmax(0,1fr) 150px; background: linear-gradient(160deg, #f6fcff 0%, #e8f7ff 66%, #f4fbf8 100%); } .sc-home-hero::before { width: 570px; height: 250px; left: -260px; bottom: -195px; } .sc-home-hero::after { width: 600px; height: 250px; right: -390px; top: -195px; } .sc-home-welcome h1 { font-size: clamp(37px, 11vw, 52px); } .sc-home-eyebrow { font-size: 14px; } .sc-role-badge { margin-top: 11px; padding: 8px 12px; font-size: 13px; } .sc-home-hero-logo { width: 150px; height: 155px; justify-self: end; } .sc-new-order { min-height: 120px; margin: 16px 0 30px; grid-template-columns: 66px minmax(0,1fr) 32px; gap: 14px; padding: 16px 16px; border-radius: 18px; } .sc-new-order-icon { width: 62px; height: 62px; font-size: 30px; } .sc-new-order-text strong { font-size: 14px; } .sc-new-order-text span { font-size: 19px; } .sc-new-order-arrow { font-size: 29px; } .sc-menu-heading { margin-bottom: 15px; } .sc-menu-heading h2 { font-size: 27px; } .sc-home-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; } .sc-home-card { min-height: 185px; padding: 16px; border-radius: 18px; } .sc-home-card-icon { width: 52px; height: 52px; margin-bottom: 16px; } .sc-home-card strong { font-size: 17px; } .sc-home-card small { font-size: 12px; } .sc-home-footer { padding-bottom: 4px; font-size: 16px; } .sc-mobile-bottom { position: fixed; z-index: 45; left: 0; right: 0; bottom: 0; height: 72px; padding: 5px 10px 7px; display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; background: rgba(255,255,255,.98); border-top: 1px solid #dbe8f2; box-shadow: 0 -6px 18px rgba(27, 89, 129, .08); } .sc-mobile-bottom button { border: 0; background: transparent; color: #70879c; display: grid; place-items: center; gap: 1px; font-size: 11px; font-weight: 700; cursor: pointer; } .sc-mobile-bottom button.active { color: var(--sc-blue); } .sc-mobile-bottom svg { width: 22px; height: 22px; } .sc-reference-login { min-height: 100dvh; padding: 18px 14px 24px; place-items: center; } .sc-reference-login-card { width: min(680px, 100%); padding: 24px 18px 20px; border-radius: 24px; } .sc-reference-login-logo { width: 190px; height: 175px; } .sc-reference-login-brand h1 { font-size: 40px; } .sc-reference-login-brand p { margin-top: 8px; margin-bottom: 20px; font-size: 17px; } .sc-reference-login-form { padding: 20px 16px 16px; } .sc-reference-field-label { font-size: 16px; } .sc-reference-input-wrap input { height: 60px; font-size: 17px; } .sc-reference-login-options { font-size: 13px; gap: 10px; } .sc-reference-login-submit { min-height: 66px; font-size: 20px; } } @media (max-width: 460px) { .sc-home-hero { min-height: 235px; grid-template-columns: minmax(0,1fr) 128px; padding-left: 18px; padding-right: 16px; } .sc-home-hero-logo { width: 128px; height: 138px; } .sc-home-welcome h1 { font-size: 38px; } .sc-new-order { grid-template-columns: 58px minmax(0,1fr) 28px; gap: 10px; } .sc-new-order-icon { width: 56px; height: 56px; } .sc-new-order-text span { font-size: 17px; } .sc-mobile-toolbar { gap: 6px; } .sc-mobile-toolbar button { height: 64px; border-radius: 18px; } .sc-home-grid { gap: 10px; } .sc-home-card { min-height: 170px; padding: 14px; } .sc-reference-login { padding: 12px 10px 18px; } .sc-reference-login-card { padding: 18px 10px 16px; border-radius: 20px; } .sc-reference-login-logo { width: 165px; height: 150px; } .sc-reference-login-brand h1 { font-size: 34px; } .sc-reference-login-form { padding: 18px 12px 14px; } .sc-reference-login-options { align-items: flex-start; flex-direction: column; } } `;
+
+  document.head.appendChild(style);
+}
+
+function scSvg(icon, label = "") {
+  const paths = {
+    menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+    user: '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.3 3.2-5 7-5s6.2 1.7 7 5"/>',
+    search: '<circle cx="10.8" cy="10.8" r="6.2"/><path d="m16 16 4.2 4.2"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    recycle:
+      '<path d="m8 5-3 5h4l-2 3 5 6 2-5h4l-3-5"/><path d="m15 5 3 3-3 3"/><path d="M18 8h-5"/>',
+    trash: '<path d="M5 7h14M9 7V4h6v3M8 10v7M12 10v7M16 10v7M7 20h10"/>',
+    print:
+      '<path d="M7 9V4h10v5M7 16h10v4H7z"/><path d="M5 9h14a2 2 0 0 1 2 2v5h-4M3 16v-5a2 2 0 0 1 2-2"/>',
+    file: '<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v5h5M10 12h5M10 16h5"/>',
+    clipboard:
+      '<path d="M9 4h6M9 3v3h6V3M6 5h12v16H6z"/><path d="M9 11h6M9 15h6"/>',
+    users:
+      '<circle cx="9" cy="9" r="3"/><circle cx="16.5" cy="10" r="2.5"/><path d="M3.5 20c.5-3.3 2.3-5 5.5-5s5 1.7 5.5 5M14 15.5c3.2-.1 5 1.5 5.5 4.5"/>',
+    tag: '<path d="M4 5v7l8 8 8-8-8-8z"/><circle cx="8.5" cy="8.5" r="1.2"/>',
+    qr: '<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M14 14h3v3h-3zM18 18h2v2h-2zM17 14h3"/>',
+    chart: '<path d="M4 19V5M4 19h17"/><path d="m7 15 4-5 3 3 5-7"/>',
+    gear: '<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.2-1.6l2-1.2-2-3.4-2.1 1.1a7 7 0 0 0-2.8-1.6L13.7 3h-3.4l-.3 2.3a7 7 0 0 0-2.8 1.6L5.1 5.8l-2 3.4 2 1.2A7 7 0 0 0 5 12c0 .6.1 1.1.2 1.6l-2 1.2 2 3.4 2.1-1.1a7 7 0 0 0 2.8 1.6l.3 2.3h3.4l.3-2.3a7 7 0 0 0 2.8-1.6l2.1 1.1 2-3.4-2-1.2c.1-.5.2-1 .2-1.6z"/>',
+    shield:
+      '<path d="M12 3 19 6v5c0 4.4-2.8 7.6-7 10-4.2-2.4-7-5.6-7-10V6z"/><path d="m9 12 2 2 4-4"/>',
+    eye: '<path d="M2.5 12s3.2-5 9.5-5 9.5 5 9.5 5-3.2 5-9.5 5-9.5-5-9.5-5z"/><circle cx="12" cy="12" r="2.5"/>',
+    eyeOff:
+      '<path d="M3 3l18 18M9.9 5.3A10.7 10.7 0 0 1 12 5c6.3 0 9.5 7 9.5 7a16 16 0 0 1-2.5 3.4M6.2 6.3C3.9 7.9 2.5 12 2.5 12s3.2 7 9.5 7c1.6 0 3-.4 4.2-1"/>',
+    home: '<path d="m3 11 9-7 9 7v9h-6v-6H9v6H3z"/>',
+  };
+
+  return ` <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="${escapeHtml(label)}" role="img"> ${paths[icon] || paths.file} </svg> `;
+}
+
+function scMenuIcon(title) {
+  const icons = {
+    "Nova narudžba": "plus",
+    Kupci: "users",
+    Narudžbe: "clipboard",
+    Cjenovnik: "tag",
+    Etikete: "tag",
+    "QR kod": "qr",
+    Računi: "file",
+    Izvještaji: "chart",
+    Administrator: "gear",
+  };
+  return scSvg(icons[title] || "file", title);
+}
+
 function loginView(error = "") {
-  app.innerHTML = ` ${SC_REFERENCE_STYLE} <main class="login-page"> <section class="login-card"> <img class="login-logo" src="/logo-login.png" alt="Super Clean logo"> <div class="login-brand"> <h1>Super Clean</h1> <p>Banja Luka · poslovna aplikacija</p> </div> <div id="login-error" class="${ error ? "error" : "error hidden" }">${escapeHtml(error)}</div> <form id="login-form" novalidate> <label class="login-field"> <span>Korisničko ime</span> <div class="login-input-wrap"> <span class="login-field-icon" aria-hidden="true">👤</span> <input name="username" autocomplete="username" placeholder="Unesite korisničko ime" required autofocus> </div> </label> <label class="login-field"> <span>Šifra</span> <div class="login-input-wrap"> <span class="login-field-icon" aria-hidden="true">🔒</span> <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Unesite šifru" required> <button type="button" class="password-toggle" id="password-toggle" aria-label="Prikaži šifru" aria-pressed="false">👁</button> </div> </label> <div class="login-options"> <span class="login-session-note">🔐 Sigurna prijava</span> <button type="button" class="change-user-button" id="change-user-button">⚙ Promijeni korisnika</button> </div> <button class="primary-button login-submit-button" id="login-button" type="submit">PRIJAVI SE <span aria-hidden="true">→</span></button> </form> <div class="login-footer">Čisto · Brzo · Profesionalno</div> </section> </main> `;
+  ensureReferenceStyles();
+
+  app.innerHTML = ` <main class="sc-reference-login"> <section class="sc-reference-login-card"> <div class="sc-reference-login-brand"> <img class="sc-reference-login-logo" src="/logo-login.png" alt="Super Clean" > <h1>Super Clean</h1> <p>Banja Luka · poslovna aplikacija</p> </div> ${ error ? `<div class="error" style="margin:0 0 14px;">${escapeHtml( error )}</div>` : "" } <form id="login-form" class="sc-reference-login-form" novalidate> <label class="sc-reference-field"> <span class="sc-reference-field-label"> ${scSvg("user", "Korisničko ime")} Korisničko ime </span> <span class="sc-reference-input-wrap"> <input name="username" autocomplete="username" placeholder="Unesite korisničko ime" required autofocus > </span> </label> <label class="sc-reference-field"> <span class="sc-reference-field-label"> ${scSvg("shield", "Šifra")} Šifra </span> <span class="sc-reference-input-wrap"> <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Unesite šifru" required > <button type="button" class="sc-reference-password-toggle" id="password-toggle" aria-label="Prikaži šifru" aria-pressed="false" >${scSvg("eye", "Prikaži šifru")}</button> </span> </label> <div class="sc-reference-login-options"> <span class="sc-remember"> <span class="sc-remember-mark">✓</span> Zapamti me na ovom uređaju </span> <button type="button" class="sc-change-user" id="change-user-button" > ${scSvg("gear", "Promijeni korisnika")} Promijeni korisnika </button> </div> <button class="sc-reference-login-submit" id="login-button" type="submit" > PRIJAVI SE &nbsp; → </button> <div class="sc-reference-secure"> ${scSvg("shield", "Sigurna prijava")} Sigurna prijava </div> </form> <div class="sc-reference-login-footer"> Čist dom • Zdraviji život </div> </section> </main> `;
 
   document.getElementById("login-form").addEventListener("submit", handleLogin);
+
   document.getElementById("password-toggle").addEventListener("click", () => {
     const passwordInput = document.getElementById("login-password");
     const toggle = document.getElementById("password-toggle");
     const visible = passwordInput.type === "text";
+
     passwordInput.type = visible ? "password" : "text";
-    toggle.textContent = visible ? "👁" : "🙈";
+    toggle.innerHTML = scSvg(
+      visible ? "eye" : "eyeOff",
+      visible ? "Prikaži šifru" : "Sakrij šifru"
+    );
     toggle.setAttribute(
       "aria-label",
       visible ? "Prikaži šifru" : "Sakrij šifru"
     );
     toggle.setAttribute("aria-pressed", String(!visible));
   });
+
   document
     .getElementById("change-user-button")
     .addEventListener("click", logout);
 }
 
-function svgIcon(kind, size = 22) {
-  const paths = {
-    menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
-    home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/>',
-    orders:
-      '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/>',
-    customers:
-      '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.7-3.3 2.8-5 6-5s5.3 1.7 6 5M14 15c2.8-.1 4.7 1.5 5.5 4.5"/>',
-    pricing:
-      '<path d="M4 5h11l5 5-10 10-6-6z"/><circle cx="11" cy="9" r="1.5"/>',
-    labels: '<path d="M4 5h9l7 7-8 8-8-8z"/><circle cx="9" cy="9" r="1.5"/>',
-    qr: '<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M14 14h3v3h-3zM19 17h1v3h-3v-3M14 19h2"/>',
-    invoices:
-      '<path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h4M9 11h6M9 15h6M9 19h4"/>',
-    reports: '<path d="M4 20V4M4 20h17"/><path d="m7 16 4-5 3 2 5-7"/>',
-    admin:
-      '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>',
-    search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
-    plus: '<path d="M12 5v14M5 12h14"/>',
-    trash: '<path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6"/>',
-    print:
-      '<path d="M6 9V3h12v6M6 17H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/>',
-    file: '<path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h4"/>',
-    more: '<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>',
-    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4.5 3.4-6.5 8-6.5s7.2 2 8 6.5"/>',
-  };
-  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ paths[kind] || paths.home }</svg>`;
-}
-
-function iconForTitle(title) {
-  const mapping = {
-    Početna: "home",
-    "Nova narudžba": "plus",
-    Kupci: "customers",
-    Narudžbe: "orders",
-    Cjenovnik: "pricing",
-    Cjenik: "pricing",
-    Etikete: "labels",
-    "QR kod": "qr",
-    Računi: "invoices",
-    Izvještaji: "reports",
-    Administrator: "admin",
-  };
-  return svgIcon(mapping[title] || "home");
-}
-
-const SC_REFERENCE_STYLE = ` <style id="sc-reference-ui"> :root{--sc-blue:#0b5fc7;--sc-blue-dark:#08458f;--sc-green:#77b82a;--sc-text:#123f78} .sc-shell{min-height:100vh;display:grid;grid-template-columns:220px minmax(0,1fr);grid-template-rows:72px minmax(0,1fr);background:radial-gradient(circle at 78% 18%,rgba(119,184,42,.12),transparent 26%),radial-gradient(circle at 8% 82%,rgba(33,137,226,.14),transparent 28%),linear-gradient(135deg,#f7fcff,#eaf6ff 52%,#f6fff0);color:var(--sc-text)} .sc-topbar{grid-column:1/-1;display:flex;align-items:center;gap:18px;padding:10px 22px;background:rgba(255,255,255,.97);border-bottom:1px solid #dbe8f4;box-shadow:0 3px 18px rgba(15,67,120,.06);position:sticky;top:0;z-index:30} .sc-brand{width:185px;display:flex;align-items:center;flex:0 0 auto}.sc-brand img{width:154px;height:52px;object-fit:contain;object-position:left center} .sc-menu-toggle,.sc-user-button{border:0;background:#edf6ff;color:var(--sc-blue-dark);width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:24px;cursor:pointer}.sc-menu-toggle{display:none} .sc-top-search{width:min(420px,38vw);height:44px;margin-left:auto;display:flex;align-items:center;gap:10px;padding:0 16px;border-radius:14px;background:#f0f7ff;border:1px solid #e1edf8}.sc-top-search input{width:100%;border:0;outline:0;background:transparent;color:var(--sc-text);font:inherit;font-size:15px} .sc-top-search svg,.sc-top-action svg,.sc-user-button svg{width:20px;height:20px}.sc-top-actions{display:flex;align-items:center;gap:8px}.sc-top-action{width:42px;height:42px;border:0;border-radius:13px;background:#f0f7ff;color:var(--sc-blue-dark);display:grid;place-items:center;cursor:pointer} .sc-user{display:flex;align-items:center;gap:9px;margin-left:6px;padding-left:12px;border-left:1px solid #e0ebf5}.sc-user-label{font-size:14px;font-weight:700;white-space:nowrap} .sc-sidebar{grid-row:2;background:rgba(255,255,255,.9);border-right:1px solid #dceaf5;padding:18px 12px;position:sticky;top:72px;height:calc(100vh - 72px);overflow-y:auto}.sc-side-list{display:flex;flex-direction:column;gap:5px} .sc-side-item{width:100%;min-height:48px;border:0;border-radius:12px;background:transparent;color:#22548a;display:flex;align-items:center;gap:12px;padding:0 14px;font:inherit;font-size:15px;font-weight:650;text-align:left;cursor:pointer}.sc-side-item:hover,.sc-side-item.active{background:#e3f2ff;color:var(--sc-blue)}.sc-side-item svg{width:22px;height:22px;flex:0 0 auto}.sc-side-divider{height:1px;background:#e1ebf3;margin:14px 10px} .sc-main{min-width:0;grid-column:2;grid-row:2;overflow:hidden}.sc-mobile-tools{display:none} .sc-home-reference{min-height:calc(100vh - 72px);padding:18px 28px 30px;position:relative;overflow:hidden} .sc-welcome{min-height:238px;border-radius:0 0 22px 22px;display:flex;align-items:center;justify-content:space-between;gap:30px;padding:28px 34px;position:relative;overflow:hidden}.sc-welcome::after{content:"";position:absolute;width:620px;height:260px;right:-160px;top:-95px;background:linear-gradient(120deg,transparent,rgba(118,192,239,.24));border-radius:50%;transform:rotate(-12deg)} .sc-welcome-copy{position:relative;z-index:2}.sc-eyebrow{display:block;color:var(--sc-blue);font-size:15px;font-weight:800;letter-spacing:.04em;margin-bottom:6px}.sc-welcome h1{margin:0;color:#07458e;font-size:clamp(36px,4vw,56px);line-height:1.05;font-weight:800}.sc-role{display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:8px 15px;border-radius:999px;background:#e5f4ff;color:var(--sc-blue);font-weight:800;font-size:14px} .sc-welcome-logo{position:relative;z-index:2;width:min(310px,30vw);max-height:205px;object-fit:contain} .sc-new-order{width:100%;min-height:116px;border:0;border-radius:17px;background:linear-gradient(105deg,#1677d8,#45a5ef);color:#fff;display:flex;align-items:center;gap:22px;padding:20px 28px;margin:8px 0 30px;box-shadow:0 12px 28px rgba(17,111,201,.18);cursor:pointer;text-align:left}.sc-new-order-icon{width:60px;height:60px;border-radius:50%;background:#fff;color:var(--sc-blue);display:grid;place-items:center;font-size:37px;flex:0 0 auto}.sc-new-order-copy{display:flex;flex-direction:column;gap:5px;min-width:0}.sc-new-order-copy strong{font-size:15px;letter-spacing:.03em}.sc-new-order-copy span{font-size:25px;font-weight:800}.sc-new-order-arrow{margin-left:auto;font-size:34px;line-height:1} .sc-menu-heading{margin:0 0 18px 2px}.sc-menu-heading .sc-eyebrow{margin-bottom:3px}.sc-menu-heading h2{margin:0;font-size:30px;line-height:1.1;color:#0b4389} .sc-home-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.sc-home-card{min-height:174px;border:1px solid #dcebf7;border-radius:16px;background:rgba(255,255,255,.96);box-shadow:0 5px 18px rgba(20,85,135,.06);padding:17px 20px 16px;display:flex;flex-direction:column;align-items:flex-start;position:relative;cursor:pointer;text-align:left;color:var(--sc-text);transition:transform .15s ease,box-shadow .15s ease}.sc-home-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(20,85,135,.1)}.sc-card-icon{width:58px;height:58px;border-radius:50%;background:#e8f5ff;color:#0a78cf;display:grid;place-items:center;margin-bottom:auto}.sc-card-icon svg{width:31px;height:31px}.sc-home-card strong{font-size:17px;color:#08488f;line-height:1.15}.sc-home-card small{display:block;margin-top:6px;padding-right:26px;color:#7593af;font-size:13px;line-height:1.3}.sc-card-arrow{position:absolute;right:17px;bottom:17px;color:#0b67b9;font-size:25px}.sc-home-footer{text-align:center;padding:28px 0 8px;color:#1974c8;font-size:17px;font-weight:700}.sc-home-footer span{color:var(--sc-green)}.sc-bottom-nav{display:none} .login-page{min-height:100vh;padding:28px 18px 36px;display:grid;place-items:center;background:radial-gradient(circle at 20% 8%,rgba(90,175,235,.17),transparent 30%),radial-gradient(circle at 85% 92%,rgba(119,184,42,.14),transparent 30%),linear-gradient(145deg,#f7fcff,#edf8ff 60%,#f8fff3)} .login-card{width:min(805px,100%);padding:24px 36px 22px;border-radius:26px;background:rgba(255,255,255,.96);box-shadow:0 18px 55px rgba(22,75,125,.13);border:1px solid rgba(210,227,240,.85)} .login-logo{display:block;width:min(350px,72%);height:260px;object-fit:contain;margin:-5px auto 0}.login-brand{text-align:center;margin:-4px 0 26px}.login-brand h1{margin:0;color:#0a4388;font-size:clamp(40px,5vw,62px);line-height:1}.login-brand p{margin:10px 0 0;color:#72b52b;font-size:20px;font-weight:700}.login-field{display:block;margin-top:18px}.login-field>span{display:block;color:#254f7c;font-size:17px;font-weight:800;margin:0 0 8px}.login-input-wrap{height:64px;border:1.5px solid #d5e2ee;border-radius:15px;background:#fff;display:flex;align-items:center;gap:11px;padding:0 14px}.login-input-wrap:focus-within{border-color:#1e70ca;box-shadow:0 0 0 3px rgba(30,112,202,.1)}.login-field-icon{font-size:22px;width:25px;text-align:center}.login-input-wrap input{min-width:0;width:100%;border:0;outline:0;background:transparent;font:inherit;color:#244668;font-size:18px}.password-toggle{flex:0 0 44px;width:44px;height:44px;border:0;border-radius:12px;background:#edf6ff;color:#1c5b97;font-size:21px;cursor:pointer}.login-options{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:15px 2px 20px;color:#67839e;font-size:15px}.login-session-note{font-weight:650}.change-user-button{border:0;background:transparent;color:#1769b8;font:inherit;font-weight:750;cursor:pointer}.login-submit-button{width:100%;min-height:68px;border:0;border-radius:16px;background:linear-gradient(105deg,#0b4ea1,#1e79d5);color:#fff;font:inherit;font-size:23px;font-weight:850;cursor:pointer;box-shadow:0 12px 24px rgba(15,92,170,.2)}.login-footer{text-align:center;color:#7b8fa4;font-size:16px;margin-top:19px} @media(max-width:1100px){.sc-home-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.sc-top-search{width:300px}} @media(max-width:800px){ .sc-shell{display:block;min-height:100vh;padding-bottom:78px}.sc-topbar{height:74px;padding:9px 16px;gap:10px;position:sticky;top:0}.sc-menu-toggle{display:grid}.sc-brand{width:auto;flex:1}.sc-brand img{width:132px;height:48px}.sc-top-search,.sc-top-actions{display:none}.sc-user{margin-left:0;padding-left:0;border-left:0}.sc-user-label{display:none}.sc-user-button{width:44px;height:44px}.sc-sidebar{display:none}.sc-main{display:block;overflow:visible}.sc-mobile-tools{display:block;padding:14px 16px 0;background:#f0f8ff}.sc-mobile-search{height:58px;border:1px solid #d6e7f4;border-radius:18px;background:#fff;display:flex;align-items:center;gap:12px;padding:0 17px;box-shadow:0 4px 14px rgba(23,91,141,.05)}.sc-mobile-search svg{width:23px;height:23px;flex:0 0 auto}.sc-mobile-search input{width:100%;border:0;outline:0;background:transparent;font:inherit;font-size:18px;color:var(--sc-text)}.sc-quick-actions{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:10px;padding-bottom:12px}.sc-quick-action{min-width:0;height:58px;border:1px solid #dbe9f4;border-radius:17px;background:#fff;color:var(--sc-blue);display:grid;place-items:center;cursor:pointer}.sc-quick-action svg{width:25px;height:25px} .sc-home-reference{min-height:auto;padding:0 16px 24px;background:radial-gradient(circle at 85% 10%,rgba(93,180,236,.15),transparent 28%),linear-gradient(145deg,#eff9ff,#f6fbff 62%,#effaf0)}.sc-welcome{min-height:240px;padding:20px 6px 12px 22px;border-radius:0;align-items:flex-start}.sc-welcome h1{font-size:44px}.sc-welcome-logo{width:46%;max-height:215px;margin-top:2px}.sc-new-order{min-height:126px;margin:10px 0 31px;padding:18px 20px;border-radius:17px;gap:16px}.sc-new-order-icon{width:59px;height:59px;font-size:35px}.sc-new-order-copy strong{font-size:14px}.sc-new-order-copy span{font-size:22px}.sc-new-order-arrow{font-size:29px}.sc-menu-heading{margin-bottom:18px}.sc-menu-heading h2{font-size:28px}.sc-home-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.sc-home-card{min-height:224px;padding:18px 16px 15px;border-radius:17px}.sc-home-footer{padding:24px 0 8px;font-size:16px}.sc-bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:40;height:76px;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(255,255,255,.98);border-top:1px solid #dce8f2;box-shadow:0 -6px 22px rgba(20,70,120,.08);padding:5px 8px 7px}.sc-bottom-nav button{border:0;background:transparent;color:#6b829b;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}.sc-bottom-nav button.active{background:#e8f5ff;color:#0b6cc1}.sc-bottom-nav svg{width:22px;height:22px} .login-page{padding:20px 16px 26px}.login-card{padding:22px 18px 20px;border-radius:25px}.login-logo{width:250px;max-width:82%;height:225px}.login-brand{margin-bottom:20px}.login-brand h1{font-size:38px}.login-brand p{font-size:17px}.login-field>span{font-size:16px}.login-input-wrap{height:62px}.login-options{flex-wrap:wrap;margin-bottom:18px}.login-submit-button{min-height:64px;font-size:21px}} @media(max-width:430px){.sc-welcome h1{font-size:38px}.sc-welcome{min-height:225px;padding-left:10px}.sc-welcome-logo{width:45%}.sc-new-order-copy span{font-size:19px}.sc-home-card{min-height:205px}} </style> `;
-
 function dashboardView(user) {
   currentUser = user;
+  ensureReferenceStyles();
 
-  const menuItems = mainMenu
-    .filter(
-      ([, title, , permission]) =>
-        hasPermission(permission) && title !== "Nova narudžba"
-    )
-    .map(([, title, description]) => ({ title, description }));
+  const sidebarItems = mainMenu
+    .filter(([, , , permission]) => hasPermission(permission))
+    .map(([icon, title, description]) => ({
+      title,
+      description,
+    }));
 
-  const sidebarItems = [
-    { title: "Početna", page: "home" },
-    ...menuItems.map((item) => ({ ...item, page: null })),
-  ];
-
-  if (currentUser.role === "ADMIN") {
-    sidebarItems.push({ divider: true });
-    sidebarItems.push({ title: "Administrator", page: "admin", admin: true });
+  if (user.role === "ADMIN") {
+    sidebarItems.push({
+      title: "Administrator",
+      description: "Upravljanje aplikacijom",
+    });
   }
 
   const sidebarHtml = sidebarItems
-    .map((item) => {
-      if (item.divider) return '<div class="sc-side-divider"></div>';
-      const target = item.page
-        ? `data-page="${escapeHtml(item.page)}"`
-        : `data-page-label="${escapeHtml(item.title)}"`;
-      return ` <button type="button" class="sc-side-item ${item.title === "Početna" ? "active" : ""}" ${target}> ${iconForTitle(item.title)} <span>${escapeHtml(item.title)}</span> </button> `;
-    })
-    .join("");
-
-  const bottomItems = [
-    { title: "Početna", page: "home" },
-    ...(hasPermission("orders.view")
-      ? [{ title: "Narudžbe", page: "orders" }]
-      : []),
-    ...(hasPermission("customers.view")
-      ? [{ title: "Kupci", page: "customers" }]
-      : []),
-    ...(currentUser.role === "ADMIN"
-      ? [{ title: "Admin", page: "admin" }]
-      : []),
-  ];
-
-  const bottomHtml = bottomItems
     .map(
-      (item) => ` <button type="button" data-page="${item.page}" class="${ item.page === "home" ? "active" : "" }"> ${iconForTitle( item.title === "Admin" ? "Administrator" : item.title )} <span>${escapeHtml(item.title)}</span> </button> `
+      (item) => ` <button type="button" class="sc-sidebar-item ${item.title === "Nova narudžba" ? "" : ""}" data-page-label="${escapeHtml(item.title)}" > ${scMenuIcon(item.title)} <span>${escapeHtml(item.title)}</span> </button> `
     )
     .join("");
 
-  app.innerHTML = ` ${SC_REFERENCE_STYLE} <div class="sc-shell"> <header class="sc-topbar"> <button class="sc-menu-toggle" id="menu-toggle" type="button" aria-label="Meni">${svgIcon( "menu", 27 )}</button> <div class="sc-brand"><img src="/logo-login.png" alt="Super Clean"></div> <div class="sc-top-search"> ${svgIcon("search")} <input id="global-search" placeholder="Pretraži..." aria-label="Pretraži"> </div> <div class="sc-top-actions"> <button class="sc-top-action" type="button" data-action="add" title="Dodaj">${svgIcon( "plus" )}</button> <button class="sc-top-action" type="button" data-action="remove" title="Ukloni">${svgIcon( "trash" )}</button> <button class="sc-top-action" type="button" data-action="print" title="Štampaj">${svgIcon( "print" )}</button> <button class="sc-top-action" type="button" data-action="pdf" title="PDF">${svgIcon( "file" )}</button> <button class="sc-top-action" type="button" data-action="search" title="Pretraga">${svgIcon( "search" )}</button> <button class="sc-top-action" id="more-actions" type="button" title="Više">${svgIcon( "more" )}</button> </div> <div class="sc-user"> <button class="sc-user-button" id="user-menu" type="button" aria-label="Korisnik">${svgIcon( "user" )}</button> <span class="sc-user-label">${escapeHtml( currentUser.firstName || "Korisnik" )}</span> </div> </header> <aside class="sc-sidebar"><div class="sc-side-list">${sidebarHtml}</div></aside> <main class="sc-main"> <div class="sc-mobile-tools"> <div class="sc-mobile-search"> ${svgIcon("search")} <input id="global-search-mobile" placeholder="Pretraži..." aria-label="Pretraži"> </div> <div class="sc-quick-actions"> <button class="sc-quick-action" type="button" data-action="add">${svgIcon( "plus", 27 )}</button> <button class="sc-quick-action" type="button" data-action="remove">${svgIcon( "trash", 25 )}</button> <button class="sc-quick-action" type="button" data-action="print">${svgIcon( "print", 25 )}</button> <button class="sc-quick-action" type="button" data-action="pdf">${svgIcon( "file", 25 )}</button> <button class="sc-quick-action" type="button" data-action="search">${svgIcon( "search", 25 )}</button> <button class="sc-quick-action" id="more-actions-mobile" type="button">${svgIcon( "more", 25 )}</button> </div> </div> <div id="page-content">${homeContent()}</div> </main> <nav class="sc-bottom-nav">${bottomHtml}</nav> <div id="drawer" class="drawer hidden"></div> <div id="modal-root"></div> <input id="excel-file" type="file" accept=".xlsx,.xls,.csv" class="hidden"> </div> `;
+  app.innerHTML = ` <div class="sc-reference-app"> <header class="sc-app-header"> <button type="button" class="sc-header-menu-button" id="menu-toggle" aria-label="Meni" > ${scSvg("menu", "Meni")} </button> <div class="sc-header-brand"> <img src="/logo-login.png" alt="Super Clean"> </div> <div class="sc-header-search"> ${scSvg("search", "Pretraži")} <input id="global-search-desktop" placeholder="Pretraži..." aria-label="Pretraži" autocomplete="off" > </div> <div class="sc-header-actions"> <button type="button" class="sc-header-action" data-action="remove" aria-label="Ukloni"> ${scSvg("trash", "Ukloni")} </button> <button type="button" class="sc-header-action" data-action="print" aria-label="Štampaj"> ${scSvg("print", "Štampaj")} </button> <button type="button" class="sc-header-action" data-action="pdf" aria-label="PDF"> ${scSvg("file", "PDF")} </button> <button type="button" class="sc-header-action" data-action="search" aria-label="Pretraga"> ${scSvg("search", "Pretraga")} </button> <button type="button" class="sc-header-action" id="more-actions" aria-label="Više"> ${scSvg("menu", "Više")} </button> <button type="button" class="sc-user-button" id="user-menu" aria-label="Korisnik"> <span class="sc-user-avatar">${scSvg( "user", "Korisnik" )}</span> <span>${escapeHtml(user.firstName || "Korisnik")}</span> </button> </div> </header> <div class="sc-layout"> <aside class="sc-sidebar"> <div class="sc-sidebar-list"> <button type="button" class="sc-sidebar-item active" data-page="home" > ${scSvg("home", "Početna")} <span>Početna</span> </button> ${sidebarHtml} </div> </aside> <main class="sc-main"> <div class="sc-mobile-tools"> <div class="sc-mobile-search"> ${scSvg("search", "Pretraži")} <input id="global-search" placeholder="Pretraži..." aria-label="Pretraži" autocomplete="off" > </div> <div class="sc-mobile-toolbar" aria-label="Brze radnje"> <button type="button" data-action="add" aria-label="Dodaj"> ${scSvg("plus", "Dodaj")} <span>Dodaj</span> </button> <button type="button" data-action="remove" aria-label="Ukloni"> ${scSvg("recycle", "Ukloni")} <span>Ukloni</span> </button> <button type="button" data-action="print" aria-label="Štampaj"> ${scSvg("print", "Štampaj")} <span>Print</span> </button> <button type="button" data-action="pdf" aria-label="PDF"> ${scSvg("file", "PDF")} <span>PDF</span> </button> <button type="button" data-action="search" aria-label="Pretraga"> ${scSvg("search", "Pretraga")} <span>Pretraga</span> </button> <button type="button" id="mobile-more-actions" aria-label="Više"> ${scSvg("menu", "Više")} <span>Više</span> </button> </div> </div> <section id="page-content">${homeContent()}</section> </main> </div> <nav class="sc-mobile-bottom"> <button type="button" data-page="home" class="active"> ${scSvg("home", "Početna")} <span>Početna</span> </button> ${ hasPermission("orders.view") ? ` <button type="button" data-page="orders"> ${scSvg("clipboard", "Narudžbe")} <span>Narudžbe</span> </button> ` : "" } ${ hasPermission("customers.view") ? ` <button type="button" data-page="customers"> ${scSvg("users", "Kupci")} <span>Kupci</span> </button> ` : "" } ${ user.role === "ADMIN" ? ` <button type="button" data-page="admin"> ${scSvg("gear", "Admin")} <span>Admin</span> </button> ` : "" } </nav> <div id="drawer" class="drawer hidden"></div> <div id="modal-root"></div> <input id="excel-file" type="file" accept=".xlsx,.xls,.csv" class="hidden"> </div> `;
 
   bindDashboard();
   loadDashboard();
 }
 
 function homeContent() {
-  const cards = mainMenu
-    .filter(
-      ([, title, , permission]) =>
-        hasPermission(permission) && title !== "Nova narudžba"
-    )
-    .map(([, title, description]) => ({ title, description }));
+  const menuItems = mainMenu
+    .filter(([, , , permission]) => hasPermission(permission))
+    .filter(([, title]) => title !== "Nova narudžba")
+    .map(([, title, description]) => ({
+      title,
+      description,
+    }));
 
   if (currentUser.role === "ADMIN") {
-    cards.push({
+    menuItems.push({
       title: "Administrator",
       description: "Upravljanje aplikacijom",
     });
   }
 
+  const cards = [
+    {
+      title: "Nova narudžba",
+      description: "Brzo zaprimanje tepiha",
+      icon: "plus",
+    },
+    ...menuItems.map((item) => ({
+      ...item,
+      icon:
+        {
+          Kupci: "users",
+          Narudžbe: "clipboard",
+          Cjenovnik: "tag",
+          Etikete: "tag",
+          "QR kod": "qr",
+          Računi: "file",
+          Izvještaji: "chart",
+          Administrator: "gear",
+        }[item.title] || "file",
+    })),
+  ];
+
   const cardHtml = cards
     .map(
-      (item) => ` <button class="sc-home-card" type="button" data-page-label="${escapeHtml( item.title )}"> <span class="sc-card-icon">${iconForTitle(item.title)}</span> <strong>${escapeHtml(item.title)}</strong> <small>${escapeHtml(item.description)}</small> <span class="sc-card-arrow" aria-hidden="true">→</span> </button> `
+      (item) => ` <button class="sc-home-card" type="button" data-page-label="${escapeHtml(item.title)}" > <span class="sc-home-card-icon"> ${scSvg(item.icon, item.title)} </span> <strong>${escapeHtml(item.title)}</strong> <small>${escapeHtml(item.description)}</small> <span class="sc-home-card-arrow" aria-hidden="true">→</span> </button> `
     )
     .join("");
 
-  const roleLabel =
-    currentUser.role === "ADMIN"
-      ? "ADMINISTRATOR"
-      : currentUser.role === "MANAGER"
-      ? "POSLOVOĐA"
-      : "KORISNIK";
-
-  return ` <section class="sc-home-reference"> <div class="sc-welcome"> <div class="sc-welcome-copy"> <span class="sc-eyebrow">DOBRO DOŠAO</span> <h1>${escapeHtml( currentUser.firstName || "Korisnik" )} 👋</h1> <span class="sc-role">${svgIcon( "admin", 17 )} ${roleLabel}</span> </div> <img class="sc-welcome-logo" src="/logo-login.png" alt="Super Clean Banja Luka"> </div> <button class="sc-new-order" type="button" data-page-label="Nova narudžba"> <span class="sc-new-order-icon">+</span> <span class="sc-new-order-copy"> <strong>NOVA NARUDŽBA</strong> <span>Brz prijem novog tepiha</span> </span> <span class="sc-new-order-arrow" aria-hidden="true">→</span> </button> <div class="sc-menu-heading"> <span class="sc-eyebrow">GLAVNI MENI</span> <h2>Šta želiš otvoriti?</h2> </div> <div class="sc-home-grid">${cardHtml}</div> <footer class="sc-home-footer">Čist dom <span>•</span> Zdraviji život</footer> </section> `;
+  return ` <section class="sc-home-hero"> <div class="sc-home-welcome"> <span class="sc-home-eyebrow">DOBRO DOŠAO</span> <h1>${escapeHtml(currentUser.firstName || "Korisnik")} 👋</h1> <span class="sc-role-badge"> ${scSvg("shield", "Uloga")} ${escapeHtml( currentUser.role === "ADMIN" ? "ADMINISTRATOR" : currentUser.role || "KORISNIK" )} </span> </div> <img class="sc-home-hero-logo" src="/logo-login.png" alt="Super Clean" > </section> <button class="sc-new-order" type="button" data-page-label="Nova narudžba" > <span class="sc-new-order-icon">+</span> <span class="sc-new-order-text"> <strong>NOVA NARUDŽBA</strong> <span>Brz prijem novog tepiha</span> </span> <span class="sc-new-order-arrow" aria-hidden="true">→</span> </button> <section class="sc-menu-heading"> <span class="sc-home-eyebrow">GLAVNI MENI</span> <h2>Šta želiš otvoriti?</h2> </section> <div class="sc-home-grid"> ${cardHtml} </div> <footer class="sc-home-footer"> <span>Čist dom</span> <b>•</b> <span>Zdraviji život</span> </footer> `;
 }
 
 function dashboardSummaryContent(summary) {
@@ -1620,19 +1629,23 @@ async function handleModalClick(event) {
 }
 
 function bindDashboard() {
-  document.querySelectorAll(".sc-bottom-nav button").forEach((button) => {
-    button.addEventListener("click", () => navigate(button.dataset.page));
-  });
-
-  document.querySelectorAll(".sc-side-item").forEach((button) => {
+  document.querySelectorAll(".sc-mobile-bottom button").forEach((button) => {
     button.addEventListener("click", () => {
-      if (button.dataset.page) {
-        navigate(button.dataset.page);
-      } else if (button.dataset.pageLabel) {
-        navigateByLabel(button.dataset.pageLabel);
-      }
+      document.querySelectorAll(".sc-mobile-bottom button").forEach((item) => {
+        item.classList.remove("active");
+      });
+      button.classList.add("active");
+      navigate(button.dataset.page);
     });
   });
+
+  document
+    .querySelectorAll(".sc-sidebar-item[data-page-label]")
+    .forEach((button) => {
+      button.addEventListener("click", () =>
+        navigateByLabel(button.dataset.pageLabel)
+      );
+    });
 
   document.querySelectorAll("[data-page-label]").forEach((button) => {
     button.addEventListener("click", () =>
@@ -1650,26 +1663,41 @@ function bindDashboard() {
     .getElementById("more-actions")
     ?.addEventListener("click", openMoreActions);
   document
-    .getElementById("more-actions-mobile")
+    .getElementById("mobile-more-actions")
     ?.addEventListener("click", openMoreActions);
   document.getElementById("menu-toggle")?.addEventListener("click", openDrawer);
   document.getElementById("user-menu")?.addEventListener("click", openUserMenu);
 
-  const searchInputs = [
-    document.getElementById("global-search"),
-    document.getElementById("global-search-mobile"),
-  ].filter(Boolean);
-
-  searchInputs.forEach((input) => {
-    input.addEventListener("keydown", (event) => {
+  const mobileSearch = document.getElementById("global-search");
+  if (mobileSearch) {
+    mobileSearch.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         const firstResult = document.querySelector(".global-search-result");
         if (firstResult) firstResult.click();
       }
     });
-  });
+  }
+
+  const desktopSearch = document.getElementById("global-search-desktop");
+  if (desktopSearch) {
+    desktopSearch.addEventListener("input", () => {
+      clearTimeout(globalSearchTimer);
+      globalSearchTimer = setTimeout(
+        () => runGlobalSearch(desktopSearch.value),
+        250
+      );
+    });
+
+    desktopSearch.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        const firstResult = document.querySelector(".global-search-result");
+        if (firstResult) firstResult.click();
+      }
+    });
+  }
 
   bindGlobalSearch();
+
   document
     .getElementById("modal-root")
     .addEventListener("click", handleModalClick);
