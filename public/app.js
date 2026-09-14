@@ -103,10 +103,9 @@ function hasPermission(code) {
 }
 
 function loginView(error = "") {
-  app.innerHTML = ` <main class="login-page"> <section class="login-card"> <img class="login-logo" src="/logo-login.png" alt="Super Clean logo"> <div class="login-brand"> <h1>Super Clean</h1> <p>Banja Luka · poslovna aplikacija</p> </div> <div id="login-error" class="${ error ? "error" : "error hidden" }">${escapeHtml(error)}</div> <form id="login-form" novalidate> <label class="login-field"> <span>Korisničko ime</span> <div class="login-input-wrap"> <span class="login-field-icon" aria-hidden="true">👤</span> <input name="username" autocomplete="username" placeholder="Unesite korisničko ime" required autofocus> </div> </label> <label class="login-field"> <span>Šifra</span> <div class="login-input-wrap"> <span class="login-field-icon" aria-hidden="true">🔒</span> <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Unesite šifru" required> <button type="button" class="password-toggle" id="password-toggle" aria-label="Prikaži šifru" aria-pressed="false">👁</button> </div> </label> <div class="login-options"> <span class="login-session-note">🔐 Sigurna prijava</span> <button type="button" class="change-user-button" id="change-user-button"> ⚙ Promijeni korisnika </button> </div> <button class="primary-button login-submit-button" id="login-button" type="submit"> PRIJAVI SE <span aria-hidden="true">→</span> </button> </form> <div class="login-footer">Čisto · Brzo · Profesionalno</div> </section> </main> `;
+  app.innerHTML = ` ${SC_REFERENCE_STYLE} <main class="login-page"> <section class="login-card"> <img class="login-logo" src="/logo-login.png" alt="Super Clean logo"> <div class="login-brand"> <h1>Super Clean</h1> <p>Banja Luka · poslovna aplikacija</p> </div> <div id="login-error" class="${ error ? "error" : "error hidden" }">${escapeHtml(error)}</div> <form id="login-form" novalidate> <label class="login-field"> <span>Korisničko ime</span> <div class="login-input-wrap"> <span class="login-field-icon" aria-hidden="true">👤</span> <input name="username" autocomplete="username" placeholder="Unesite korisničko ime" required autofocus> </div> </label> <label class="login-field"> <span>Šifra</span> <div class="login-input-wrap"> <span class="login-field-icon" aria-hidden="true">🔒</span> <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Unesite šifru" required> <button type="button" class="password-toggle" id="password-toggle" aria-label="Prikaži šifru" aria-pressed="false">👁</button> </div> </label> <div class="login-options"> <span class="login-session-note">🔐 Sigurna prijava</span> <button type="button" class="change-user-button" id="change-user-button">⚙ Promijeni korisnika</button> </div> <button class="primary-button login-submit-button" id="login-button" type="submit">PRIJAVI SE <span aria-hidden="true">→</span></button> </form> <div class="login-footer">Čisto · Brzo · Profesionalno</div> </section> </main> `;
 
   document.getElementById("login-form").addEventListener("submit", handleLogin);
-
   document.getElementById("password-toggle").addEventListener("click", () => {
     const passwordInput = document.getElementById("login-password");
     const toggle = document.getElementById("password-toggle");
@@ -119,46 +118,143 @@ function loginView(error = "") {
     );
     toggle.setAttribute("aria-pressed", String(!visible));
   });
-
   document
     .getElementById("change-user-button")
     .addEventListener("click", logout);
 }
 
+function svgIcon(kind, size = 22) {
+  const paths = {
+    menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+    home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/>',
+    orders:
+      '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/>',
+    customers:
+      '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.7-3.3 2.8-5 6-5s5.3 1.7 6 5M14 15c2.8-.1 4.7 1.5 5.5 4.5"/>',
+    pricing:
+      '<path d="M4 5h11l5 5-10 10-6-6z"/><circle cx="11" cy="9" r="1.5"/>',
+    labels: '<path d="M4 5h9l7 7-8 8-8-8z"/><circle cx="9" cy="9" r="1.5"/>',
+    qr: '<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M14 14h3v3h-3zM19 17h1v3h-3v-3M14 19h2"/>',
+    invoices:
+      '<path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h4M9 11h6M9 15h6M9 19h4"/>',
+    reports: '<path d="M4 20V4M4 20h17"/><path d="m7 16 4-5 3 2 5-7"/>',
+    admin:
+      '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>',
+    search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    trash: '<path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6"/>',
+    print:
+      '<path d="M6 9V3h12v6M6 17H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/>',
+    file: '<path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h4"/>',
+    more: '<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4.5 3.4-6.5 8-6.5s7.2 2 8 6.5"/>',
+  };
+  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ paths[kind] || paths.home }</svg>`;
+}
+
+function iconForTitle(title) {
+  const mapping = {
+    Početna: "home",
+    "Nova narudžba": "plus",
+    Kupci: "customers",
+    Narudžbe: "orders",
+    Cjenovnik: "pricing",
+    Cjenik: "pricing",
+    Etikete: "labels",
+    "QR kod": "qr",
+    Računi: "invoices",
+    Izvještaji: "reports",
+    Administrator: "admin",
+  };
+  return svgIcon(mapping[title] || "home");
+}
+
+const SC_REFERENCE_STYLE = ` <style id="sc-reference-ui"> :root{--sc-blue:#0b5fc7;--sc-blue-dark:#08458f;--sc-green:#77b82a;--sc-text:#123f78} .sc-shell{min-height:100vh;display:grid;grid-template-columns:220px minmax(0,1fr);grid-template-rows:72px minmax(0,1fr);background:radial-gradient(circle at 78% 18%,rgba(119,184,42,.12),transparent 26%),radial-gradient(circle at 8% 82%,rgba(33,137,226,.14),transparent 28%),linear-gradient(135deg,#f7fcff,#eaf6ff 52%,#f6fff0);color:var(--sc-text)} .sc-topbar{grid-column:1/-1;display:flex;align-items:center;gap:18px;padding:10px 22px;background:rgba(255,255,255,.97);border-bottom:1px solid #dbe8f4;box-shadow:0 3px 18px rgba(15,67,120,.06);position:sticky;top:0;z-index:30} .sc-brand{width:185px;display:flex;align-items:center;flex:0 0 auto}.sc-brand img{width:154px;height:52px;object-fit:contain;object-position:left center} .sc-menu-toggle,.sc-user-button{border:0;background:#edf6ff;color:var(--sc-blue-dark);width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:24px;cursor:pointer}.sc-menu-toggle{display:none} .sc-top-search{width:min(420px,38vw);height:44px;margin-left:auto;display:flex;align-items:center;gap:10px;padding:0 16px;border-radius:14px;background:#f0f7ff;border:1px solid #e1edf8}.sc-top-search input{width:100%;border:0;outline:0;background:transparent;color:var(--sc-text);font:inherit;font-size:15px} .sc-top-search svg,.sc-top-action svg,.sc-user-button svg{width:20px;height:20px}.sc-top-actions{display:flex;align-items:center;gap:8px}.sc-top-action{width:42px;height:42px;border:0;border-radius:13px;background:#f0f7ff;color:var(--sc-blue-dark);display:grid;place-items:center;cursor:pointer} .sc-user{display:flex;align-items:center;gap:9px;margin-left:6px;padding-left:12px;border-left:1px solid #e0ebf5}.sc-user-label{font-size:14px;font-weight:700;white-space:nowrap} .sc-sidebar{grid-row:2;background:rgba(255,255,255,.9);border-right:1px solid #dceaf5;padding:18px 12px;position:sticky;top:72px;height:calc(100vh - 72px);overflow-y:auto}.sc-side-list{display:flex;flex-direction:column;gap:5px} .sc-side-item{width:100%;min-height:48px;border:0;border-radius:12px;background:transparent;color:#22548a;display:flex;align-items:center;gap:12px;padding:0 14px;font:inherit;font-size:15px;font-weight:650;text-align:left;cursor:pointer}.sc-side-item:hover,.sc-side-item.active{background:#e3f2ff;color:var(--sc-blue)}.sc-side-item svg{width:22px;height:22px;flex:0 0 auto}.sc-side-divider{height:1px;background:#e1ebf3;margin:14px 10px} .sc-main{min-width:0;grid-column:2;grid-row:2;overflow:hidden}.sc-mobile-tools{display:none} .sc-home-reference{min-height:calc(100vh - 72px);padding:18px 28px 30px;position:relative;overflow:hidden} .sc-welcome{min-height:238px;border-radius:0 0 22px 22px;display:flex;align-items:center;justify-content:space-between;gap:30px;padding:28px 34px;position:relative;overflow:hidden}.sc-welcome::after{content:"";position:absolute;width:620px;height:260px;right:-160px;top:-95px;background:linear-gradient(120deg,transparent,rgba(118,192,239,.24));border-radius:50%;transform:rotate(-12deg)} .sc-welcome-copy{position:relative;z-index:2}.sc-eyebrow{display:block;color:var(--sc-blue);font-size:15px;font-weight:800;letter-spacing:.04em;margin-bottom:6px}.sc-welcome h1{margin:0;color:#07458e;font-size:clamp(36px,4vw,56px);line-height:1.05;font-weight:800}.sc-role{display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:8px 15px;border-radius:999px;background:#e5f4ff;color:var(--sc-blue);font-weight:800;font-size:14px} .sc-welcome-logo{position:relative;z-index:2;width:min(310px,30vw);max-height:205px;object-fit:contain} .sc-new-order{width:100%;min-height:116px;border:0;border-radius:17px;background:linear-gradient(105deg,#1677d8,#45a5ef);color:#fff;display:flex;align-items:center;gap:22px;padding:20px 28px;margin:8px 0 30px;box-shadow:0 12px 28px rgba(17,111,201,.18);cursor:pointer;text-align:left}.sc-new-order-icon{width:60px;height:60px;border-radius:50%;background:#fff;color:var(--sc-blue);display:grid;place-items:center;font-size:37px;flex:0 0 auto}.sc-new-order-copy{display:flex;flex-direction:column;gap:5px;min-width:0}.sc-new-order-copy strong{font-size:15px;letter-spacing:.03em}.sc-new-order-copy span{font-size:25px;font-weight:800}.sc-new-order-arrow{margin-left:auto;font-size:34px;line-height:1} .sc-menu-heading{margin:0 0 18px 2px}.sc-menu-heading .sc-eyebrow{margin-bottom:3px}.sc-menu-heading h2{margin:0;font-size:30px;line-height:1.1;color:#0b4389} .sc-home-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.sc-home-card{min-height:174px;border:1px solid #dcebf7;border-radius:16px;background:rgba(255,255,255,.96);box-shadow:0 5px 18px rgba(20,85,135,.06);padding:17px 20px 16px;display:flex;flex-direction:column;align-items:flex-start;position:relative;cursor:pointer;text-align:left;color:var(--sc-text);transition:transform .15s ease,box-shadow .15s ease}.sc-home-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(20,85,135,.1)}.sc-card-icon{width:58px;height:58px;border-radius:50%;background:#e8f5ff;color:#0a78cf;display:grid;place-items:center;margin-bottom:auto}.sc-card-icon svg{width:31px;height:31px}.sc-home-card strong{font-size:17px;color:#08488f;line-height:1.15}.sc-home-card small{display:block;margin-top:6px;padding-right:26px;color:#7593af;font-size:13px;line-height:1.3}.sc-card-arrow{position:absolute;right:17px;bottom:17px;color:#0b67b9;font-size:25px}.sc-home-footer{text-align:center;padding:28px 0 8px;color:#1974c8;font-size:17px;font-weight:700}.sc-home-footer span{color:var(--sc-green)}.sc-bottom-nav{display:none} .login-page{min-height:100vh;padding:28px 18px 36px;display:grid;place-items:center;background:radial-gradient(circle at 20% 8%,rgba(90,175,235,.17),transparent 30%),radial-gradient(circle at 85% 92%,rgba(119,184,42,.14),transparent 30%),linear-gradient(145deg,#f7fcff,#edf8ff 60%,#f8fff3)} .login-card{width:min(805px,100%);padding:24px 36px 22px;border-radius:26px;background:rgba(255,255,255,.96);box-shadow:0 18px 55px rgba(22,75,125,.13);border:1px solid rgba(210,227,240,.85)} .login-logo{display:block;width:min(350px,72%);height:260px;object-fit:contain;margin:-5px auto 0}.login-brand{text-align:center;margin:-4px 0 26px}.login-brand h1{margin:0;color:#0a4388;font-size:clamp(40px,5vw,62px);line-height:1}.login-brand p{margin:10px 0 0;color:#72b52b;font-size:20px;font-weight:700}.login-field{display:block;margin-top:18px}.login-field>span{display:block;color:#254f7c;font-size:17px;font-weight:800;margin:0 0 8px}.login-input-wrap{height:64px;border:1.5px solid #d5e2ee;border-radius:15px;background:#fff;display:flex;align-items:center;gap:11px;padding:0 14px}.login-input-wrap:focus-within{border-color:#1e70ca;box-shadow:0 0 0 3px rgba(30,112,202,.1)}.login-field-icon{font-size:22px;width:25px;text-align:center}.login-input-wrap input{min-width:0;width:100%;border:0;outline:0;background:transparent;font:inherit;color:#244668;font-size:18px}.password-toggle{flex:0 0 44px;width:44px;height:44px;border:0;border-radius:12px;background:#edf6ff;color:#1c5b97;font-size:21px;cursor:pointer}.login-options{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:15px 2px 20px;color:#67839e;font-size:15px}.login-session-note{font-weight:650}.change-user-button{border:0;background:transparent;color:#1769b8;font:inherit;font-weight:750;cursor:pointer}.login-submit-button{width:100%;min-height:68px;border:0;border-radius:16px;background:linear-gradient(105deg,#0b4ea1,#1e79d5);color:#fff;font:inherit;font-size:23px;font-weight:850;cursor:pointer;box-shadow:0 12px 24px rgba(15,92,170,.2)}.login-footer{text-align:center;color:#7b8fa4;font-size:16px;margin-top:19px} @media(max-width:1100px){.sc-home-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.sc-top-search{width:300px}} @media(max-width:800px){ .sc-shell{display:block;min-height:100vh;padding-bottom:78px}.sc-topbar{height:74px;padding:9px 16px;gap:10px;position:sticky;top:0}.sc-menu-toggle{display:grid}.sc-brand{width:auto;flex:1}.sc-brand img{width:132px;height:48px}.sc-top-search,.sc-top-actions{display:none}.sc-user{margin-left:0;padding-left:0;border-left:0}.sc-user-label{display:none}.sc-user-button{width:44px;height:44px}.sc-sidebar{display:none}.sc-main{display:block;overflow:visible}.sc-mobile-tools{display:block;padding:14px 16px 0;background:#f0f8ff}.sc-mobile-search{height:58px;border:1px solid #d6e7f4;border-radius:18px;background:#fff;display:flex;align-items:center;gap:12px;padding:0 17px;box-shadow:0 4px 14px rgba(23,91,141,.05)}.sc-mobile-search svg{width:23px;height:23px;flex:0 0 auto}.sc-mobile-search input{width:100%;border:0;outline:0;background:transparent;font:inherit;font-size:18px;color:var(--sc-text)}.sc-quick-actions{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:10px;padding-bottom:12px}.sc-quick-action{min-width:0;height:58px;border:1px solid #dbe9f4;border-radius:17px;background:#fff;color:var(--sc-blue);display:grid;place-items:center;cursor:pointer}.sc-quick-action svg{width:25px;height:25px} .sc-home-reference{min-height:auto;padding:0 16px 24px;background:radial-gradient(circle at 85% 10%,rgba(93,180,236,.15),transparent 28%),linear-gradient(145deg,#eff9ff,#f6fbff 62%,#effaf0)}.sc-welcome{min-height:240px;padding:20px 6px 12px 22px;border-radius:0;align-items:flex-start}.sc-welcome h1{font-size:44px}.sc-welcome-logo{width:46%;max-height:215px;margin-top:2px}.sc-new-order{min-height:126px;margin:10px 0 31px;padding:18px 20px;border-radius:17px;gap:16px}.sc-new-order-icon{width:59px;height:59px;font-size:35px}.sc-new-order-copy strong{font-size:14px}.sc-new-order-copy span{font-size:22px}.sc-new-order-arrow{font-size:29px}.sc-menu-heading{margin-bottom:18px}.sc-menu-heading h2{font-size:28px}.sc-home-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.sc-home-card{min-height:224px;padding:18px 16px 15px;border-radius:17px}.sc-home-footer{padding:24px 0 8px;font-size:16px}.sc-bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:40;height:76px;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(255,255,255,.98);border-top:1px solid #dce8f2;box-shadow:0 -6px 22px rgba(20,70,120,.08);padding:5px 8px 7px}.sc-bottom-nav button{border:0;background:transparent;color:#6b829b;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}.sc-bottom-nav button.active{background:#e8f5ff;color:#0b6cc1}.sc-bottom-nav svg{width:22px;height:22px} .login-page{padding:20px 16px 26px}.login-card{padding:22px 18px 20px;border-radius:25px}.login-logo{width:250px;max-width:82%;height:225px}.login-brand{margin-bottom:20px}.login-brand h1{font-size:38px}.login-brand p{font-size:17px}.login-field>span{font-size:16px}.login-input-wrap{height:62px}.login-options{flex-wrap:wrap;margin-bottom:18px}.login-submit-button{min-height:64px;font-size:21px}} @media(max-width:430px){.sc-welcome h1{font-size:38px}.sc-welcome{min-height:225px;padding-left:10px}.sc-welcome-logo{width:45%}.sc-new-order-copy span{font-size:19px}.sc-home-card{min-height:205px}} </style> `;
+
 function dashboardView(user) {
   currentUser = user;
 
-  const sidebarItems = mainMenu
-    .filter(([, , , permission]) => hasPermission(permission))
-    .map(([icon, title, description]) => ({ icon, title, description }));
+  const menuItems = mainMenu
+    .filter(
+      ([, title, , permission]) =>
+        hasPermission(permission) && title !== "Nova narudžba"
+    )
+    .map(([, title, description]) => ({ title, description }));
 
-  app.innerHTML = ` <div class="sc-app-shell"> <header class="sc-topbar"> <div class="sc-topbar-left"> <button class="sc-menu-button" id="menu-toggle" aria-label="Meni">☰</button> <div class="sc-brand"> <img src="/logo-login.png" alt="Super Clean"> <div> <strong>Super Clean</strong> <span>Banja Luka</span> </div> </div> </div> <div class="sc-topbar-center"> <label class="sc-search"> <span>⌕</span> <input id="global-search" placeholder="Pretraži..." aria-label="Pretraži"> </label> <div class="sc-toolbar"> <button type="button" data-action="add" aria-label="Dodaj">✚</button> <button type="button" data-action="remove" aria-label="Ukloni">♲</button> <button type="button" data-action="print" aria-label="Print">▣</button> <button type="button" data-action="pdf" aria-label="PDF">▤</button> <button type="button" data-action="search" aria-label="Pretraga">⌕</button> <button type="button" id="more-actions" aria-label="Više">•••</button> </div> </div> <button class="sc-user-button" id="user-menu" type="button"> <span class="sc-user-avatar">👤</span> <span>Korisnik</span> <b>⌄</b> </button> </header> <div class="sc-layout"> <aside class="sc-sidebar" id="sc-sidebar"> <nav> <button class="sc-nav-item active" data-page="home"> <span>⌂</span><strong>Početna</strong> </button> ${sidebarItems .map( (item) => ` <button class="sc-nav-item" data-page-label="${escapeHtml( item.title )}"> <span>${item.icon}</span><strong>${escapeHtml( item.title )}</strong> </button> ` ) .join("")} ${ user.role === "ADMIN" ? ` <div class="sc-nav-divider"></div> <button class="sc-nav-item" data-page="admin"> <span>⚙</span><strong>Administrator</strong> </button> ` : "" } </nav> </aside> <main class="sc-main"> <div class="sc-mobile-toolbar"> <label class="sc-search sc-search-mobile"> <span>⌕</span> <input id="global-search-mobile" placeholder="Pretraži..." aria-label="Pretraži"> </label> <div class="sc-toolbar sc-toolbar-mobile"> <button type="button" data-action="add" aria-label="Dodaj">✚</button> <button type="button" data-action="remove" aria-label="Ukloni">♲</button> <button type="button" data-action="print" aria-label="Print">▣</button> <button type="button" data-action="pdf" aria-label="PDF">▤</button> <button type="button" data-action="search" aria-label="Pretraga">⌕</button> <button type="button" id="more-actions-mobile" aria-label="Više">•••</button> </div> </div> <div id="page-content">${homeContent()}</div> </main> </div> <nav class="bottom-nav"> <button data-page="home">⌂<span>Početna</span></button> ${ hasPermission("orders.view") ? '<button data-page="orders">▣<span>Narudžbe</span></button>' : "" } ${ hasPermission("customers.view") ? '<button data-page="customers">♙<span>Kupci</span></button>' : "" } ${ user.role === "ADMIN" ? '<button data-page="admin">⚙<span>Admin</span></button>' : "" } </nav> <div id="drawer" class="drawer hidden"></div> <div id="modal-root"></div> <input id="excel-file" type="file" accept=".xlsx,.xls,.csv" class="hidden"> </div> `;
+  const sidebarItems = [
+    { title: "Početna", page: "home" },
+    ...menuItems.map((item) => ({ ...item, page: null })),
+  ];
+
+  if (currentUser.role === "ADMIN") {
+    sidebarItems.push({ divider: true });
+    sidebarItems.push({ title: "Administrator", page: "admin", admin: true });
+  }
+
+  const sidebarHtml = sidebarItems
+    .map((item) => {
+      if (item.divider) return '<div class="sc-side-divider"></div>';
+      const target = item.page
+        ? `data-page="${escapeHtml(item.page)}"`
+        : `data-page-label="${escapeHtml(item.title)}"`;
+      return ` <button type="button" class="sc-side-item ${item.title === "Početna" ? "active" : ""}" ${target}> ${iconForTitle(item.title)} <span>${escapeHtml(item.title)}</span> </button> `;
+    })
+    .join("");
+
+  const bottomItems = [
+    { title: "Početna", page: "home" },
+    ...(hasPermission("orders.view")
+      ? [{ title: "Narudžbe", page: "orders" }]
+      : []),
+    ...(hasPermission("customers.view")
+      ? [{ title: "Kupci", page: "customers" }]
+      : []),
+    ...(currentUser.role === "ADMIN"
+      ? [{ title: "Admin", page: "admin" }]
+      : []),
+  ];
+
+  const bottomHtml = bottomItems
+    .map(
+      (item) => ` <button type="button" data-page="${item.page}" class="${ item.page === "home" ? "active" : "" }"> ${iconForTitle( item.title === "Admin" ? "Administrator" : item.title )} <span>${escapeHtml(item.title)}</span> </button> `
+    )
+    .join("");
+
+  app.innerHTML = ` ${SC_REFERENCE_STYLE} <div class="sc-shell"> <header class="sc-topbar"> <button class="sc-menu-toggle" id="menu-toggle" type="button" aria-label="Meni">${svgIcon( "menu", 27 )}</button> <div class="sc-brand"><img src="/logo-login.png" alt="Super Clean"></div> <div class="sc-top-search"> ${svgIcon("search")} <input id="global-search" placeholder="Pretraži..." aria-label="Pretraži"> </div> <div class="sc-top-actions"> <button class="sc-top-action" type="button" data-action="add" title="Dodaj">${svgIcon( "plus" )}</button> <button class="sc-top-action" type="button" data-action="remove" title="Ukloni">${svgIcon( "trash" )}</button> <button class="sc-top-action" type="button" data-action="print" title="Štampaj">${svgIcon( "print" )}</button> <button class="sc-top-action" type="button" data-action="pdf" title="PDF">${svgIcon( "file" )}</button> <button class="sc-top-action" type="button" data-action="search" title="Pretraga">${svgIcon( "search" )}</button> <button class="sc-top-action" id="more-actions" type="button" title="Više">${svgIcon( "more" )}</button> </div> <div class="sc-user"> <button class="sc-user-button" id="user-menu" type="button" aria-label="Korisnik">${svgIcon( "user" )}</button> <span class="sc-user-label">${escapeHtml( currentUser.firstName || "Korisnik" )}</span> </div> </header> <aside class="sc-sidebar"><div class="sc-side-list">${sidebarHtml}</div></aside> <main class="sc-main"> <div class="sc-mobile-tools"> <div class="sc-mobile-search"> ${svgIcon("search")} <input id="global-search-mobile" placeholder="Pretraži..." aria-label="Pretraži"> </div> <div class="sc-quick-actions"> <button class="sc-quick-action" type="button" data-action="add">${svgIcon( "plus", 27 )}</button> <button class="sc-quick-action" type="button" data-action="remove">${svgIcon( "trash", 25 )}</button> <button class="sc-quick-action" type="button" data-action="print">${svgIcon( "print", 25 )}</button> <button class="sc-quick-action" type="button" data-action="pdf">${svgIcon( "file", 25 )}</button> <button class="sc-quick-action" type="button" data-action="search">${svgIcon( "search", 25 )}</button> <button class="sc-quick-action" id="more-actions-mobile" type="button">${svgIcon( "more", 25 )}</button> </div> </div> <div id="page-content">${homeContent()}</div> </main> <nav class="sc-bottom-nav">${bottomHtml}</nav> <div id="drawer" class="drawer hidden"></div> <div id="modal-root"></div> <input id="excel-file" type="file" accept=".xlsx,.xls,.csv" class="hidden"> </div> `;
 
   bindDashboard();
   loadDashboard();
 }
 
 function homeContent() {
-  const menuItems = mainMenu
-    .filter(([, , , permission]) => hasPermission(permission))
-    .filter(([, title]) => title !== "Nova narudžba")
-    .map(([icon, title, description]) => ({ icon, title, description }));
+  const cards = mainMenu
+    .filter(
+      ([, title, , permission]) =>
+        hasPermission(permission) && title !== "Nova narudžba"
+    )
+    .map(([, title, description]) => ({ title, description }));
 
   if (currentUser.role === "ADMIN") {
-    menuItems.push({
-      icon: "⚙️",
+    cards.push({
       title: "Administrator",
       description: "Upravljanje aplikacijom",
     });
   }
 
-  const cards = menuItems
+  const cardHtml = cards
     .map(
-      (item) => ` <button class="sc-menu-card" type="button" data-page-label="${escapeHtml( item.title )}"> <span class="sc-card-icon">${item.icon}</span> <span class="sc-card-content"> <strong>${escapeHtml(item.title)}</strong> <small>${escapeHtml(item.description)}</small> </span> <span class="sc-card-arrow">→</span> </button> `
+      (item) => ` <button class="sc-home-card" type="button" data-page-label="${escapeHtml( item.title )}"> <span class="sc-card-icon">${iconForTitle(item.title)}</span> <strong>${escapeHtml(item.title)}</strong> <small>${escapeHtml(item.description)}</small> <span class="sc-card-arrow" aria-hidden="true">→</span> </button> `
     )
     .join("");
 
-  return ` <section class="sc-home"> <div class="sc-home-hero"> <div class="sc-welcome"> <span class="sc-eyebrow">DOBRO DOŠAO</span> <h1>${escapeHtml( currentUser.firstName || "Korisnik" )} 👋</h1> <span class="sc-role-badge">🛡 ${escapeHtml( currentUser.roleName || currentUser.role || "Korisnik" )}</span> </div> <img class="sc-home-logo" src="/logo-login.png" alt="Super Clean"> </div> <button class="sc-new-order" type="button" data-page-label="Nova narudžba"> <span class="sc-new-order-plus">+</span> <span class="sc-new-order-text"> <strong>NOVA NARUDŽBA</strong> <small>Brz prijem novog tepiha</small> </span> <span class="sc-new-order-arrow">→</span> </button> <div class="sc-section-title"> <span class="sc-eyebrow">GLAVNI MENI</span> <h2>Šta želiš otvoriti?</h2> </div> <div class="sc-menu-grid"> ${cards} </div> <footer class="sc-home-footer"> <strong>Čist dom</strong> <span>•</span> <strong>Zdraviji život</strong> </footer> </section> `;
+  const roleLabel =
+    currentUser.role === "ADMIN"
+      ? "ADMINISTRATOR"
+      : currentUser.role === "MANAGER"
+      ? "POSLOVOĐA"
+      : "KORISNIK";
+
+  return ` <section class="sc-home-reference"> <div class="sc-welcome"> <div class="sc-welcome-copy"> <span class="sc-eyebrow">DOBRO DOŠAO</span> <h1>${escapeHtml( currentUser.firstName || "Korisnik" )} 👋</h1> <span class="sc-role">${svgIcon( "admin", 17 )} ${roleLabel}</span> </div> <img class="sc-welcome-logo" src="/logo-login.png" alt="Super Clean Banja Luka"> </div> <button class="sc-new-order" type="button" data-page-label="Nova narudžba"> <span class="sc-new-order-icon">+</span> <span class="sc-new-order-copy"> <strong>NOVA NARUDŽBA</strong> <span>Brz prijem novog tepiha</span> </span> <span class="sc-new-order-arrow" aria-hidden="true">→</span> </button> <div class="sc-menu-heading"> <span class="sc-eyebrow">GLAVNI MENI</span> <h2>Šta želiš otvoriti?</h2> </div> <div class="sc-home-grid">${cardHtml}</div> <footer class="sc-home-footer">Čist dom <span>•</span> Zdraviji život</footer> </section> `;
 }
 
 function dashboardSummaryContent(summary) {
@@ -1524,12 +1620,18 @@ async function handleModalClick(event) {
 }
 
 function bindDashboard() {
-  document.querySelectorAll(".bottom-nav button").forEach((button) => {
+  document.querySelectorAll(".sc-bottom-nav button").forEach((button) => {
     button.addEventListener("click", () => navigate(button.dataset.page));
   });
 
-  document.querySelectorAll(".sc-nav-item[data-page]").forEach((button) => {
-    button.addEventListener("click", () => navigate(button.dataset.page));
+  document.querySelectorAll(".sc-side-item").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (button.dataset.page) {
+        navigate(button.dataset.page);
+      } else if (button.dataset.pageLabel) {
+        navigateByLabel(button.dataset.pageLabel);
+      }
+    });
   });
 
   document.querySelectorAll("[data-page-label]").forEach((button) => {
@@ -1538,13 +1640,11 @@ function bindDashboard() {
     );
   });
 
-  document
-    .querySelectorAll(".sc-toolbar button[data-action]")
-    .forEach((button) => {
-      button.addEventListener("click", () =>
-        handleToolbarAction(button.dataset.action)
-      );
-    });
+  document.querySelectorAll("[data-action]").forEach((button) => {
+    button.addEventListener("click", () =>
+      handleToolbarAction(button.dataset.action)
+    );
+  });
 
   document
     .getElementById("more-actions")
@@ -1555,26 +1655,21 @@ function bindDashboard() {
   document.getElementById("menu-toggle")?.addEventListener("click", openDrawer);
   document.getElementById("user-menu")?.addEventListener("click", openUserMenu);
 
-  document
-    .getElementById("global-search")
-    ?.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        const firstResult = document.querySelector(".global-search-result");
-        if (firstResult) firstResult.click();
-      }
-    });
+  const searchInputs = [
+    document.getElementById("global-search"),
+    document.getElementById("global-search-mobile"),
+  ].filter(Boolean);
 
-  document
-    .getElementById("global-search-mobile")
-    ?.addEventListener("keydown", (event) => {
+  searchInputs.forEach((input) => {
+    input.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         const firstResult = document.querySelector(".global-search-result");
         if (firstResult) firstResult.click();
       }
     });
+  });
 
   bindGlobalSearch();
-
   document
     .getElementById("modal-root")
     .addEventListener("click", handleModalClick);
