@@ -23,6 +23,7 @@ if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
 }
 
 const app = express();
+app.set("trust proxy", 1);
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 app.disable("x-powered-by");
