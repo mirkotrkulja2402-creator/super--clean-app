@@ -103,7 +103,7 @@ function hasPermission(code) {
 }
 
 function loginView(error = "") {
-  app.innerHTML = ` <main class="login-page"> <section class="login-card"> <img class="login-logo" src="/logo-login.png" alt="Super Clean logo"> <div class="login-brand"> <h1>Super Clean</h1> <p>Banja Luka · poslovna aplikacija</p> </div> <div id="login-error" class="${ error ? "error" : "error hidden" }">${escapeHtml(error)}</div> <form id="login-form" novalidate> <label class="login-field"> <span>Korisničko ime</span> <div class="login-input-wrap"> <span class="login-field-icon" aria-hidden="true">👤</span> <input name="username" autocomplete="username" placeholder="Unesite korisničko ime" required autofocus > </div> </label> <label class="login-field"> <span>Šifra</span> <div class="login-input-wrap"> <span class="login-field-icon" aria-hidden="true">🔒</span> <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Unesite šifru" required > <button type="button" class="password-toggle" id="password-toggle" aria-label="Prikaži šifru" aria-pressed="false" >👁</button> </div> </label> <div class="login-options"> <span class="login-session-note">🔐 Sigurna prijava</span> <button type="button" class="change-user-button" id="change-user-button"> ⚙ Promijeni korisnika </button> </div> <button class="primary-button login-submit-button" id="login-button" type="submit"> PRIJAVI SE <span aria-hidden="true">→</span> </button> </form> <div class="login-footer">Čisto · Brzo · Profesionalno</div> </section> </main> `;
+  app.innerHTML = ` <main class="login-page"> <section class="login-card"> <img class="login-logo" src="/logo-login.png" alt="Super Clean logo"> <div class="login-brand"> <h1>Super Clean</h1> <p>Banja Luka · poslovna aplikacija</p> </div> <div id="login-error" class="${ error ? "error" : "error hidden" }">${escapeHtml(error)}</div> <form id="login-form" novalidate> <label class="login-field"> <span>Korisničko ime</span> <div class="login-input-wrap"> <span class="login-field-icon" aria-hidden="true">👤</span> <input name="username" autocomplete="username" placeholder="Unesite korisničko ime" required autofocus> </div> </label> <label class="login-field"> <span>Šifra</span> <div class="login-input-wrap"> <span class="login-field-icon" aria-hidden="true">🔒</span> <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Unesite šifru" required> <button type="button" class="password-toggle" id="password-toggle" aria-label="Prikaži šifru" aria-pressed="false">👁</button> </div> </label> <div class="login-options"> <span class="login-session-note">🔐 Sigurna prijava</span> <button type="button" class="change-user-button" id="change-user-button"> ⚙ Promijeni korisnika </button> </div> <button class="primary-button login-submit-button" id="login-button" type="submit"> PRIJAVI SE <span aria-hidden="true">→</span> </button> </form> <div class="login-footer">Čisto · Brzo · Profesionalno</div> </section> </main> `;
 
   document.getElementById("login-form").addEventListener("submit", handleLogin);
 
@@ -111,7 +111,6 @@ function loginView(error = "") {
     const passwordInput = document.getElementById("login-password");
     const toggle = document.getElementById("password-toggle");
     const visible = passwordInput.type === "text";
-
     passwordInput.type = visible ? "password" : "text";
     toggle.textContent = visible ? "👁" : "🙈";
     toggle.setAttribute(
@@ -126,27 +125,14 @@ function loginView(error = "") {
     .addEventListener("click", logout);
 }
 
-const SC_HOME_SCREEN_STYLE = ` .sc-home-app{min-height:100vh;background:linear-gradient(135deg,#f7fbff 0%,#edf8ff 55%,#f7fcf5 100%);color:#123f78} .sc-home-app .sc-app-header{height:76px;display:flex;align-items:center;gap:18px;padding:10px 24px;box-sizing:border-box;background:rgba(255,255,255,.97);border-bottom:1px solid #dceaf5;box-shadow:0 3px 18px rgba(18,63,120,.07);position:sticky;top:0;z-index:30} .sc-home-app .sc-header-menu{width:46px;height:46px;border:0;border-radius:14px;background:#edf6ff;color:#0d5eb7;font-size:25px;cursor:pointer} .sc-home-app .sc-header-brand{display:flex;align-items:center;flex:1;min-width:0} .sc-home-app .sc-header-brand img{width:164px;height:52px;object-fit:contain;object-position:left center} .sc-home-app .sc-header-tools{display:flex;align-items:center;gap:8px} .sc-home-app .sc-header-search{position:relative;width:min(270px,26vw)} .sc-home-app .sc-header-search input{width:100%;height:44px;box-sizing:border-box;border:1px solid #dceaf5;border-radius:14px;background:#f2f8ff;padding:0 16px 0 42px;color:#183f70;outline:none} .sc-home-app .sc-header-search span{position:absolute;left:15px;top:11px;font-size:18px;pointer-events:none} .sc-home-app .sc-header-tool{width:44px;height:44px;border:0;border-radius:13px;background:#f1f7fd;color:#125aa8;font-size:19px;cursor:pointer} .sc-home-app .sc-header-user{display:flex;align-items:center;gap:9px;margin-left:8px;padding-left:14px;border:0;border-left:1px solid #dceaf5;background:transparent;color:#174d8b;font-weight:700;white-space:nowrap;cursor:pointer} .sc-home-app .sc-header-user-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:50%;background:#e9f4ff;border:1px solid #cfe5f8;font-size:20px} .sc-home-app .sc-app-layout{display:flex;min-height:calc(100vh - 76px)} .sc-home-app .sc-sidebar{width:218px;flex:0 0 218px;background:rgba(255,255,255,.9);border-right:1px solid #dceaf5;padding:18px 10px;box-sizing:border-box} .sc-home-app .sc-sidebar-nav{display:flex;flex-direction:column;gap:5px} .sc-home-app .sc-sidebar-item{width:100%;min-height:48px;display:flex;align-items:center;gap:12px;border:0;border-radius:12px;padding:0 14px;background:transparent;color:#164e89;font-size:15px;font-weight:700;text-align:left;cursor:pointer} .sc-home-app .sc-sidebar-item:hover,.sc-home-app .sc-sidebar-item.active{background:#e4f3ff;color:#0a68c4} .sc-home-app .sc-sidebar-icon{width:25px;text-align:center;font-size:20px} .sc-home-app .sc-sidebar-divider{height:1px;background:#e2edf5;margin:13px 8px} .sc-home-app .sc-main-area{min-width:0;flex:1} .sc-home-app .sc-main-area>.mobile-search,.sc-home-app .sc-main-area>.quick-toolbar{display:none} .sc-home-app #page-content{min-height:calc(100vh - 76px);box-sizing:border-box} .sc-home-app .sc-home-page{min-height:calc(100vh - 76px);box-sizing:border-box;padding:26px 30px 28px;background:linear-gradient(160deg,rgba(224,242,255,.62),transparent 34%),linear-gradient(25deg,rgba(225,247,220,.48),transparent 28%)} .sc-home-app .sc-welcome{min-height:180px;display:flex;align-items:center;justify-content:space-between;gap:28px;padding:18px 42px 12px 50px;box-sizing:border-box;border-radius:0 0 24px 24px;background:linear-gradient(110deg,rgba(255,255,255,.94),rgba(239,249,255,.78));margin:-26px -30px 20px;border-bottom:1px solid #dcebf6} .sc-home-app .sc-welcome-copy{min-width:0} .sc-home-app .sc-eyebrow{display:block;color:#176dbd;font-size:14px;font-weight:900;letter-spacing:.7px;margin-bottom:5px} .sc-home-app .sc-welcome h1{margin:0;color:#064b9a;font-size:clamp(32px,3vw,48px);line-height:1.05;letter-spacing:-.7px} .sc-home-app .sc-role{display:inline-flex;align-items:center;gap:6px;margin-top:11px;padding:7px 13px;border-radius:12px;background:#e5f4ff;color:#1970bc;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.5px} .sc-home-app .sc-welcome-logo{width:235px;height:155px;object-fit:contain;flex:0 0 auto} .sc-home-app .sc-new-order{width:100%;min-height:112px;display:flex;align-items:center;gap:22px;padding:18px 28px;box-sizing:border-box;border:0;border-radius:16px;background:linear-gradient(110deg,#1577d1 0%,#2f9df0 100%);color:#fff;box-shadow:0 12px 28px rgba(24,111,193,.18);cursor:pointer;text-align:left} .sc-home-app .sc-new-order-icon{width:64px;height:64px;display:grid;place-items:center;flex:0 0 64px;border-radius:50%;background:#fff;color:#1673cb;font-size:31px} .sc-home-app .sc-new-order-copy{flex:1;min-width:0} .sc-home-app .sc-new-order-copy strong,.sc-home-app .sc-new-order-copy small{display:block} .sc-home-app .sc-new-order-copy strong{font-size:14px;letter-spacing:.7px} .sc-home-app .sc-new-order-copy small{margin-top:4px;font-size:23px;font-weight:900} .sc-home-app .sc-new-order-arrow{font-size:34px;font-weight:300} .sc-home-app .sc-menu-title{margin:28px 4px 14px} .sc-home-app .sc-menu-title span{display:block;color:#2675b9;font-size:13px;font-weight:900;letter-spacing:.7px} .sc-home-app .sc-menu-title h2{margin:4px 0 0;color:#074c97;font-size:31px;line-height:1.1} .sc-home-app .sc-home-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px} .sc-home-app .sc-home-card{min-height:164px;position:relative;display:flex;flex-direction:column;align-items:flex-start;padding:18px;border:1px solid #d8e9f5;border-radius:16px;background:rgba(255,255,255,.92);box-shadow:0 7px 20px rgba(22,84,135,.07);color:#154e89;text-align:left;cursor:pointer;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease} .sc-home-app .sc-home-card:hover{transform:translateY(-2px);border-color:#b9dff5;box-shadow:0 12px 24px rgba(22,84,135,.11)} .sc-home-app .sc-home-card-icon{width:48px;height:48px;display:grid;place-items:center;margin-bottom:16px;border-radius:50%;background:linear-gradient(145deg,#e9f7ff,#d8f1ff);color:#0a78cc;font-size:24px;border:1px solid #c9e7f7} .sc-home-app .sc-home-card-text strong,.sc-home-app .sc-home-card-text small{display:block} .sc-home-app .sc-home-card-text strong{color:#084b91;font-size:16px} .sc-home-app .sc-home-card-text small{margin-top:5px;color:#4380b5;font-size:12px;line-height:1.3} .sc-home-app .sc-home-card-arrow{position:absolute;right:18px;bottom:15px;color:#146bb4;font-size:25px} .sc-home-app .sc-home-card.sc-admin-card{min-height:92px;flex-direction:row;align-items:center;padding:12px 18px} .sc-home-app .sc-home-card.sc-admin-card .sc-home-card-icon{margin:0 13px 0 0} .sc-home-app .sc-home-footer{padding:26px 0 4px;text-align:center;color:#1681d1;font-size:17px;font-weight:800;font-style:italic} .sc-home-app .sc-home-footer b{margin:0 5px;color:#72b632} .sc-home-app .bottom-nav{display:none} @media(max-width:1100px){.sc-home-app .sc-home-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.sc-home-app .sc-sidebar{width:190px;flex-basis:190px}.sc-home-app .sc-header-search{width:210px}} @media(max-width:800px){ .sc-home-app{min-height:100dvh;padding-bottom:76px} .sc-home-app .sc-app-header{height:70px;padding:8px 14px;position:relative} .sc-home-app .sc-header-menu{width:44px;height:44px} .sc-home-app .sc-header-brand img{width:150px;height:50px} .sc-home-app .sc-header-tools{margin-left:auto} .sc-home-app .sc-header-search,.sc-home-app .sc-header-tool{display:none} .sc-home-app .sc-header-user{border-left:0;margin:0;padding:0} .sc-home-app .sc-header-user>span:last-child{display:none} .sc-home-app .sc-app-layout{display:block;min-height:0} .sc-home-app .sc-sidebar{display:none} .sc-home-app .sc-main-area{width:100%} .sc-home-app .sc-main-area>.mobile-search{display:block;position:relative;margin:12px 14px 8px} .sc-home-app .mobile-search>span{position:absolute;left:15px;top:12px;z-index:2;font-size:20px} .sc-home-app .mobile-search input{width:100%;height:58px;box-sizing:border-box;border:1px solid #d5e5f1;border-radius:17px;background:rgba(248,252,255,.96);padding:0 16px 0 52px;color:#244c73;font-size:17px;outline:none;box-shadow:0 5px 16px rgba(21,77,122,.07)} .sc-home-app .sc-main-area>.quick-toolbar{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin:0 14px 8px;padding:7px;border:1px solid #dbeaf4;border-radius:17px;background:rgba(255,255,255,.94);box-shadow:0 6px 16px rgba(21,77,122,.06)} .sc-home-app .quick-toolbar button{min-width:0;height:52px;border:0;border-radius:13px;background:#f1f7fc;color:#145c9d;font-size:24px;cursor:pointer} .sc-home-app .quick-toolbar button span{display:none} .sc-home-app .sc-home-page{min-height:0;padding:8px 14px 25px;background:transparent} .sc-home-app .sc-welcome{min-height:0;margin:0 0 13px;padding:18px;border-radius:19px} .sc-home-app .sc-welcome h1{font-size:29px} .sc-home-app .sc-eyebrow{font-size:12px} .sc-home-app .sc-welcome-logo{width:110px;height:90px} .sc-home-app .sc-new-order{min-height:92px;padding:14px 16px;gap:13px;border-radius:17px} .sc-home-app .sc-new-order-icon{width:50px;height:50px;flex-basis:50px;font-size:25px} .sc-home-app .sc-new-order-copy strong{font-size:11px} .sc-home-app .sc-new-order-copy small{font-size:16px} .sc-home-app .sc-new-order-arrow{font-size:28px} .sc-home-app .sc-menu-title{margin:21px 2px 11px} .sc-home-app .sc-menu-title h2{font-size:25px} .sc-home-app .sc-home-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px} .sc-home-app .sc-home-card{min-height:145px;padding:14px;border-radius:16px} .sc-home-app .sc-home-card-icon{width:42px;height:42px;margin-bottom:12px;font-size:21px} .sc-home-app .sc-home-card-text strong{font-size:14px} .sc-home-app .sc-home-card-text small{font-size:11px} .sc-home-app .sc-home-card-arrow{right:13px;bottom:10px} .sc-home-app .sc-home-card.sc-admin-card{grid-column:1/-1;min-height:70px} .sc-home-app .sc-home-footer{padding-top:18px;font-size:14px} .sc-home-app .bottom-nav{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:50;grid-template-columns:repeat(4,1fr);height:76px;padding:6px 8px 5px;box-sizing:border-box;background:rgba(255,255,255,.97);border-top:1px solid #dceaf5;box-shadow:0 -5px 18px rgba(17,70,116,.08)} .sc-home-app .bottom-nav button{border:0;border-radius:16px;background:transparent;color:#21567f;font-size:21px;cursor:pointer} .sc-home-app .bottom-nav button span{display:block;margin-top:2px;font-size:11px;font-weight:800} .sc-home-app .bottom-nav button[data-page="home"]{background:#e6f4ff;color:#0872c7} } @media(max-width:420px){.sc-home-app .sc-header-brand img{width:132px}.sc-home-app .sc-welcome-logo{width:92px;height:78px}.sc-home-app .sc-welcome h1{font-size:26px}.sc-home-app .sc-home-card{min-height:138px}} `;
-
 function dashboardView(user) {
   currentUser = user;
 
   const sidebarItems = mainMenu
     .filter(([, , , permission]) => hasPermission(permission))
-    .map(([icon, title]) => ({ icon, title }));
+    .map(([icon, title, description]) => ({ icon, title, description }));
 
-  const sidebarHtml = sidebarItems
-    .map(
-      (item) => ` <button type="button" class="sc-sidebar-item" data-page-label="${escapeHtml( item.title )}"> <span class="sc-sidebar-icon">${item.icon}</span> <span>${escapeHtml(item.title)}</span> </button> `
-    )
-    .join("");
-
-  const adminSidebar =
-    currentUser.role === "ADMIN"
-      ? ` <div class="sc-sidebar-divider"></div> <button type="button" class="sc-sidebar-item" data-page-label="Administrator"> <span class="sc-sidebar-icon">⚙️</span> <span>Administrator</span> </button> `
-      : "";
-
-  app.innerHTML = ` <style id="sc-home-screen-style">${SC_HOME_SCREEN_STYLE}</style> <div class="mobile-app sc-home-app"> <header class="sc-app-header"> <button class="sc-header-menu" id="menu-toggle" type="button" aria-label="Meni">☰</button> <div class="sc-header-brand"> <img src="/logo-login.png" alt="Super Clean"> </div> <div class="sc-header-tools"> <label class="sc-header-search"> <span>🔎</span> <input id="global-search" placeholder="Pretraži..." aria-label="Pretraži"> </label> <button class="sc-header-tool" type="button" aria-label="Informacije">◉</button> <button class="sc-header-tool" type="button" data-action="remove" aria-label="Ukloni">🗑️</button> <button class="sc-header-tool" type="button" data-action="print" aria-label="Print">🖨️</button> <button class="sc-header-tool" type="button" data-action="pdf" aria-label="PDF">📄</button> <button class="sc-header-tool" type="button" data-action="search" aria-label="Pretraga">🔎</button> <button class="sc-header-tool" id="more-actions" type="button" aria-label="Više">•••</button> <button class="sc-header-user" id="user-menu" type="button" aria-label="Korisnik"> <span class="sc-header-user-icon">👤</span> <span>${escapeHtml( currentUser.firstName || "Korisnik" )}⌄</span> </button> </div> </header> <div class="sc-app-layout"> <aside class="sc-sidebar"> <nav class="sc-sidebar-nav" aria-label="Glavni meni"> <button type="button" class="sc-sidebar-item active" data-page="home"> <span class="sc-sidebar-icon">🏠</span> <span>Početna</span> </button> ${sidebarHtml} ${adminSidebar} </nav> </aside> <section class="sc-main-area"> <div class="mobile-search"> <span>🔎</span> <input id="global-search-mobile" placeholder="Pretraži..." aria-label="Pretraži"> </div> <div class="quick-toolbar" aria-label="Brze radnje"> <button data-action="add" type="button">➕<span>Dodaj</span></button> <button data-action="remove" type="button">🗑️<span>Ukloni</span></button> <button data-action="print" type="button">🖨️<span>Print</span></button> <button data-action="pdf" type="button">📄<span>PDF</span></button> <button data-action="search" type="button">🔎<span>Pretraga</span></button> <button id="more-actions-mobile" type="button">•••<span>Više</span></button> </div> <main id="page-content">${homeContent()}</main> </section> </div> <nav class="bottom-nav" aria-label="Mobilna navigacija"> <button data-page="home" type="button">🏠<span>Početna</span></button> ${ hasPermission("orders.view") ? '<button data-page="orders" type="button">📋<span>Narudžbe</span></button>' : "" } ${ hasPermission("customers.view") ? '<button data-page="customers" type="button">👥<span>Kupci</span></button>' : "" } ${ currentUser.role === "ADMIN" ? '<button data-page="admin" type="button">⚙️<span>Admin</span></button>' : "" } </nav> <div id="drawer" class="drawer hidden"></div> <div id="modal-root"></div> <input id="excel-file" type="file" accept=".xlsx,.xls,.csv" class="hidden"> </div> `;
+  app.innerHTML = ` <div class="sc-app-shell"> <header class="sc-topbar"> <div class="sc-topbar-left"> <button class="sc-menu-button" id="menu-toggle" aria-label="Meni">☰</button> <div class="sc-brand"> <img src="/logo-login.png" alt="Super Clean"> <div> <strong>Super Clean</strong> <span>Banja Luka</span> </div> </div> </div> <div class="sc-topbar-center"> <label class="sc-search"> <span>⌕</span> <input id="global-search" placeholder="Pretraži..." aria-label="Pretraži"> </label> <div class="sc-toolbar"> <button type="button" data-action="add" aria-label="Dodaj">✚</button> <button type="button" data-action="remove" aria-label="Ukloni">♲</button> <button type="button" data-action="print" aria-label="Print">▣</button> <button type="button" data-action="pdf" aria-label="PDF">▤</button> <button type="button" data-action="search" aria-label="Pretraga">⌕</button> <button type="button" id="more-actions" aria-label="Više">•••</button> </div> </div> <button class="sc-user-button" id="user-menu" type="button"> <span class="sc-user-avatar">👤</span> <span>Korisnik</span> <b>⌄</b> </button> </header> <div class="sc-layout"> <aside class="sc-sidebar" id="sc-sidebar"> <nav> <button class="sc-nav-item active" data-page="home"> <span>⌂</span><strong>Početna</strong> </button> ${sidebarItems .map( (item) => ` <button class="sc-nav-item" data-page-label="${escapeHtml( item.title )}"> <span>${item.icon}</span><strong>${escapeHtml( item.title )}</strong> </button> ` ) .join("")} ${ user.role === "ADMIN" ? ` <div class="sc-nav-divider"></div> <button class="sc-nav-item" data-page="admin"> <span>⚙</span><strong>Administrator</strong> </button> ` : "" } </nav> </aside> <main class="sc-main"> <div class="sc-mobile-toolbar"> <label class="sc-search sc-search-mobile"> <span>⌕</span> <input id="global-search-mobile" placeholder="Pretraži..." aria-label="Pretraži"> </label> <div class="sc-toolbar sc-toolbar-mobile"> <button type="button" data-action="add" aria-label="Dodaj">✚</button> <button type="button" data-action="remove" aria-label="Ukloni">♲</button> <button type="button" data-action="print" aria-label="Print">▣</button> <button type="button" data-action="pdf" aria-label="PDF">▤</button> <button type="button" data-action="search" aria-label="Pretraga">⌕</button> <button type="button" id="more-actions-mobile" aria-label="Više">•••</button> </div> </div> <div id="page-content">${homeContent()}</div> </main> </div> <nav class="bottom-nav"> <button data-page="home">⌂<span>Početna</span></button> ${ hasPermission("orders.view") ? '<button data-page="orders">▣<span>Narudžbe</span></button>' : "" } ${ hasPermission("customers.view") ? '<button data-page="customers">♙<span>Kupci</span></button>' : "" } ${ user.role === "ADMIN" ? '<button data-page="admin">⚙<span>Admin</span></button>' : "" } </nav> <div id="drawer" class="drawer hidden"></div> <div id="modal-root"></div> <input id="excel-file" type="file" accept=".xlsx,.xls,.csv" class="hidden"> </div> `;
 
   bindDashboard();
   loadDashboard();
@@ -158,21 +144,21 @@ function homeContent() {
     .filter(([, title]) => title !== "Nova narudžba")
     .map(([icon, title, description]) => ({ icon, title, description }));
 
+  if (currentUser.role === "ADMIN") {
+    menuItems.push({
+      icon: "⚙️",
+      title: "Administrator",
+      description: "Upravljanje aplikacijom",
+    });
+  }
+
   const cards = menuItems
     .map(
-      (item) => ` <button class="sc-home-card" type="button" data-page-label="${escapeHtml( item.title )}"> <span class="sc-home-card-icon">${item.icon}</span> <span class="sc-home-card-text"> <strong>${escapeHtml(item.title)}</strong> <small>${escapeHtml(item.description)}</small> </span> <span class="sc-home-card-arrow" aria-hidden="true">›</span> </button> `
+      (item) => ` <button class="sc-menu-card" type="button" data-page-label="${escapeHtml( item.title )}"> <span class="sc-card-icon">${item.icon}</span> <span class="sc-card-content"> <strong>${escapeHtml(item.title)}</strong> <small>${escapeHtml(item.description)}</small> </span> <span class="sc-card-arrow">→</span> </button> `
     )
     .join("");
 
-  const adminCard =
-    currentUser.role === "ADMIN"
-      ? ` <button class="sc-home-card sc-admin-card" type="button" data-page-label="Administrator"> <span class="sc-home-card-icon">⚙️</span> <span class="sc-home-card-text"> <strong>Administrator</strong> <small>Upravljanje aplikacijom</small> </span> <span class="sc-home-card-arrow" aria-hidden="true">›</span> </button> `
-      : "";
-
-  const firstName = currentUser.firstName || "Korisnik";
-  const roleName = currentUser.roleName || currentUser.role || "Korisnik";
-
-  return ` <section class="sc-home-page"> <section class="sc-welcome"> <div class="sc-welcome-copy"> <span class="sc-eyebrow">DOBRO DOŠAO</span> <h1>${escapeHtml(firstName)} 👋</h1> <span class="sc-role">🛡️ ${escapeHtml(roleName)}</span> </div> <img class="sc-welcome-logo" src="/logo-login.png" alt="Super Clean"> </section> <button class="sc-new-order" type="button" data-page-label="Nova narudžba"> <span class="sc-new-order-icon">＋</span> <span class="sc-new-order-copy"> <strong>NOVA NARUDŽBA</strong> <small>Brz prijem novog tepiha</small> </span> <span class="sc-new-order-arrow" aria-hidden="true">→</span> </button> <div class="sc-menu-title"> <span>GLAVNI MENI</span> <h2>Šta želiš otvoriti?</h2> </div> <div class="sc-home-grid"> <button class="sc-home-card" type="button" data-page-label="Nova narudžba"> <span class="sc-home-card-icon">＋</span> <span class="sc-home-card-text"> <strong>Nova narudžba</strong> <small>Brzo zaprimanje tepiha</small> </span> <span class="sc-home-card-arrow" aria-hidden="true">›</span> </button> ${cards} ${adminCard} </div> <footer class="sc-home-footer">Čist dom <b>•</b> Zdraviji život</footer> </section> `;
+  return ` <section class="sc-home"> <div class="sc-home-hero"> <div class="sc-welcome"> <span class="sc-eyebrow">DOBRO DOŠAO</span> <h1>${escapeHtml( currentUser.firstName || "Korisnik" )} 👋</h1> <span class="sc-role-badge">🛡 ${escapeHtml( currentUser.roleName || currentUser.role || "Korisnik" )}</span> </div> <img class="sc-home-logo" src="/logo-login.png" alt="Super Clean"> </div> <button class="sc-new-order" type="button" data-page-label="Nova narudžba"> <span class="sc-new-order-plus">+</span> <span class="sc-new-order-text"> <strong>NOVA NARUDŽBA</strong> <small>Brz prijem novog tepiha</small> </span> <span class="sc-new-order-arrow">→</span> </button> <div class="sc-section-title"> <span class="sc-eyebrow">GLAVNI MENI</span> <h2>Šta želiš otvoriti?</h2> </div> <div class="sc-menu-grid"> ${cards} </div> <footer class="sc-home-footer"> <strong>Čist dom</strong> <span>•</span> <strong>Zdraviji život</strong> </footer> </section> `;
 }
 
 function dashboardSummaryContent(summary) {
@@ -1542,38 +1528,18 @@ function bindDashboard() {
     button.addEventListener("click", () => navigate(button.dataset.page));
   });
 
+  document.querySelectorAll(".sc-nav-item[data-page]").forEach((button) => {
+    button.addEventListener("click", () => navigate(button.dataset.page));
+  });
+
   document.querySelectorAll("[data-page-label]").forEach((button) => {
     button.addEventListener("click", () =>
       navigateByLabel(button.dataset.pageLabel)
     );
   });
 
-  document.querySelectorAll(".sc-sidebar-item").forEach((button) => {
-    button.addEventListener("click", () => {
-      document
-        .querySelectorAll(".sc-sidebar-item")
-        .forEach((item) => item.classList.remove("active"));
-      button.classList.add("active");
-      if (button.dataset.page) {
-        navigate(button.dataset.page);
-      } else {
-        navigateByLabel(button.dataset.pageLabel);
-      }
-    });
-  });
-
-  document.querySelectorAll(".quick-toolbar button").forEach((button) => {
-    button.addEventListener("click", () => {
-      if (button.id === "more-actions-mobile") {
-        openMoreActions();
-        return;
-      }
-      handleToolbarAction(button.dataset.action);
-    });
-  });
-
   document
-    .querySelectorAll(".sc-header-tool[data-action]")
+    .querySelectorAll(".sc-toolbar button[data-action]")
     .forEach((button) => {
       button.addEventListener("click", () =>
         handleToolbarAction(button.dataset.action)
@@ -1583,50 +1549,47 @@ function bindDashboard() {
   document
     .getElementById("more-actions")
     ?.addEventListener("click", openMoreActions);
+  document
+    .getElementById("more-actions-mobile")
+    ?.addEventListener("click", openMoreActions);
   document.getElementById("menu-toggle")?.addEventListener("click", openDrawer);
   document.getElementById("user-menu")?.addEventListener("click", openUserMenu);
 
-  const desktopSearch = document.getElementById("global-search");
-  const mobileSearch = document.getElementById("global-search-mobile");
-
-  const focusSearch = (input) => input?.focus();
-
   document
-    .querySelectorAll('.sc-header-tool[aria-label="Pretraga"]')
-    .forEach((button) => {
-      button.addEventListener("click", () => focusSearch(desktopSearch));
+    .getElementById("global-search")
+    ?.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        const firstResult = document.querySelector(".global-search-result");
+        if (firstResult) firstResult.click();
+      }
     });
 
   document
-    .querySelectorAll('.quick-toolbar button[data-action="search"]')
-    .forEach((button) => {
-      button.addEventListener("click", () => focusSearch(mobileSearch));
+    .getElementById("global-search-mobile")
+    ?.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        const firstResult = document.querySelector(".global-search-result");
+        if (firstResult) firstResult.click();
+      }
     });
-
-  const handleSearchEnter = (event) => {
-    if (event.key !== "Enter") return;
-    document.querySelector(".global-search-result")?.click();
-  };
-
-  desktopSearch?.addEventListener("keydown", handleSearchEnter);
-  mobileSearch?.addEventListener("keydown", handleSearchEnter);
 
   bindGlobalSearch();
 
-  mobileSearch?.addEventListener("input", () => {
-    if (desktopSearch) desktopSearch.value = mobileSearch.value;
-    clearTimeout(globalSearchTimer);
-    globalSearchTimer = setTimeout(
-      () => runGlobalSearch(mobileSearch.value),
-      250
-    );
-  });
-
   document
     .getElementById("modal-root")
-    ?.addEventListener("click", handleModalClick);
+    .addEventListener("click", handleModalClick);
   navigate("home");
 }
+
+const orderStatusNames = {
+  RECEIVED: "Zaprimljeno",
+  WASHING: "Na pranju",
+  DRYING: "Sušenje",
+  READY: "Spremno",
+  DELIVERED: "Isporučeno",
+  PAID: "Plaćeno",
+  CANCELLED: "Otkazano",
+};
 
 function todayIso() {
   const date = new Date();
