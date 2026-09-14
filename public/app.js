@@ -87,58 +87,6 @@ let currentPage = "home";
 let activeAdminTab = "users";
 let selectedRecord = null;
 
-let appConfig = {
-  activeTheme: "modern-rounded",
-  defaultTheme: "modern-rounded",
-  customThemes: [],
-  homeLayout: {
-    order: mainMenu.map(([, title]) => title),
-    hidden: [],
-  },
-};
-
-const themeFamilies = [
-  ["Super Clean", "#0b67c9", "#39bfe8", "#eef8ff"],
-  ["Business", "#164b9b", "#2b7de9", "#f3f7fc"],
-  ["Modern", "#2563eb", "#06b6d4", "#f1f7ff"],
-  ["Carpet", "#087f8c", "#5bb7b5", "#effaf9"],
-  ["Soft", "#5b6ee1", "#8aa6ff", "#f5f6ff"],
-  ["Premium", "#243b6b", "#c79a45", "#f7f5ef"],
-  ["Aqua", "#087ea4", "#39c6d8", "#effcff"],
-  ["Future", "#2457d6", "#7c4dff", "#f3f2ff"],
-  ["Dark", "#1f5db8", "#31b6c8", "#101827"],
-  ["Winter", "#1b64b4", "#78c7ff", "#f2f8ff"],
-  ["Spring", "#23845a", "#7bcf63", "#f2fbf5"],
-  ["Summer", "#087ca4", "#f0b429", "#fffaf0"],
-  ["Autumn", "#9a4b1c", "#d38b2f", "#fff7ef"],
-];
-
-const themeVariants = [
-  ["Rounded", "rounded", "pill"],
-  ["Glass", "glass", "glass"],
-  ["Soft Cards", "soft", "rounded"],
-  ["Clean Pro", "sharp", "classic"],
-];
-
-const themeCatalog = themeFamilies.flatMap(
-  ([family, primary, accent, background], familyIndex) =>
-    themeVariants.map(([variant, shape, buttons], variantIndex) => ({
-      id: `${family.toLowerCase().replaceAll(" ", "-")}-${variant .toLowerCase() .replaceAll(" ", "-")}`,
-      name: `${family} ${variant}`,
-      group: family,
-      primary,
-      accent,
-      background,
-      text: family === "Dark" ? "#eef6ff" : "#19314f",
-      surface: family === "Dark" ? "#172235" : "#ffffff",
-      shape,
-      buttons,
-      size: variant === "Soft Cards" ? "large" : "normal",
-      shadows: variant === "Glass" ? "strong" : "subtle",
-      order: familyIndex * 10 + variantIndex,
-    }))
-);
-
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -178,97 +126,53 @@ function loginView(error = "") {
     .addEventListener("click", logout);
 }
 
+const SC_HOME_SCREEN_STYLE = ` .sc-home-app{min-height:100vh;background:linear-gradient(135deg,#f7fbff 0%,#edf8ff 55%,#f7fcf5 100%);color:#123f78} .sc-home-app .sc-app-header{height:76px;display:flex;align-items:center;gap:18px;padding:10px 24px;box-sizing:border-box;background:rgba(255,255,255,.97);border-bottom:1px solid #dceaf5;box-shadow:0 3px 18px rgba(18,63,120,.07);position:sticky;top:0;z-index:30} .sc-home-app .sc-header-menu{width:46px;height:46px;border:0;border-radius:14px;background:#edf6ff;color:#0d5eb7;font-size:25px;cursor:pointer} .sc-home-app .sc-header-brand{display:flex;align-items:center;flex:1;min-width:0} .sc-home-app .sc-header-brand img{width:164px;height:52px;object-fit:contain;object-position:left center} .sc-home-app .sc-header-tools{display:flex;align-items:center;gap:8px} .sc-home-app .sc-header-search{position:relative;width:min(270px,26vw)} .sc-home-app .sc-header-search input{width:100%;height:44px;box-sizing:border-box;border:1px solid #dceaf5;border-radius:14px;background:#f2f8ff;padding:0 16px 0 42px;color:#183f70;outline:none} .sc-home-app .sc-header-search span{position:absolute;left:15px;top:11px;font-size:18px;pointer-events:none} .sc-home-app .sc-header-tool{width:44px;height:44px;border:0;border-radius:13px;background:#f1f7fd;color:#125aa8;font-size:19px;cursor:pointer} .sc-home-app .sc-header-user{display:flex;align-items:center;gap:9px;margin-left:8px;padding-left:14px;border:0;border-left:1px solid #dceaf5;background:transparent;color:#174d8b;font-weight:700;white-space:nowrap;cursor:pointer} .sc-home-app .sc-header-user-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:50%;background:#e9f4ff;border:1px solid #cfe5f8;font-size:20px} .sc-home-app .sc-app-layout{display:flex;min-height:calc(100vh - 76px)} .sc-home-app .sc-sidebar{width:218px;flex:0 0 218px;background:rgba(255,255,255,.9);border-right:1px solid #dceaf5;padding:18px 10px;box-sizing:border-box} .sc-home-app .sc-sidebar-nav{display:flex;flex-direction:column;gap:5px} .sc-home-app .sc-sidebar-item{width:100%;min-height:48px;display:flex;align-items:center;gap:12px;border:0;border-radius:12px;padding:0 14px;background:transparent;color:#164e89;font-size:15px;font-weight:700;text-align:left;cursor:pointer} .sc-home-app .sc-sidebar-item:hover,.sc-home-app .sc-sidebar-item.active{background:#e4f3ff;color:#0a68c4} .sc-home-app .sc-sidebar-icon{width:25px;text-align:center;font-size:20px} .sc-home-app .sc-sidebar-divider{height:1px;background:#e2edf5;margin:13px 8px} .sc-home-app .sc-main-area{min-width:0;flex:1} .sc-home-app .sc-main-area>.mobile-search,.sc-home-app .sc-main-area>.quick-toolbar{display:none} .sc-home-app #page-content{min-height:calc(100vh - 76px);box-sizing:border-box} .sc-home-app .sc-home-page{min-height:calc(100vh - 76px);box-sizing:border-box;padding:26px 30px 28px;background:linear-gradient(160deg,rgba(224,242,255,.62),transparent 34%),linear-gradient(25deg,rgba(225,247,220,.48),transparent 28%)} .sc-home-app .sc-welcome{min-height:180px;display:flex;align-items:center;justify-content:space-between;gap:28px;padding:18px 42px 12px 50px;box-sizing:border-box;border-radius:0 0 24px 24px;background:linear-gradient(110deg,rgba(255,255,255,.94),rgba(239,249,255,.78));margin:-26px -30px 20px;border-bottom:1px solid #dcebf6} .sc-home-app .sc-welcome-copy{min-width:0} .sc-home-app .sc-eyebrow{display:block;color:#176dbd;font-size:14px;font-weight:900;letter-spacing:.7px;margin-bottom:5px} .sc-home-app .sc-welcome h1{margin:0;color:#064b9a;font-size:clamp(32px,3vw,48px);line-height:1.05;letter-spacing:-.7px} .sc-home-app .sc-role{display:inline-flex;align-items:center;gap:6px;margin-top:11px;padding:7px 13px;border-radius:12px;background:#e5f4ff;color:#1970bc;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.5px} .sc-home-app .sc-welcome-logo{width:235px;height:155px;object-fit:contain;flex:0 0 auto} .sc-home-app .sc-new-order{width:100%;min-height:112px;display:flex;align-items:center;gap:22px;padding:18px 28px;box-sizing:border-box;border:0;border-radius:16px;background:linear-gradient(110deg,#1577d1 0%,#2f9df0 100%);color:#fff;box-shadow:0 12px 28px rgba(24,111,193,.18);cursor:pointer;text-align:left} .sc-home-app .sc-new-order-icon{width:64px;height:64px;display:grid;place-items:center;flex:0 0 64px;border-radius:50%;background:#fff;color:#1673cb;font-size:31px} .sc-home-app .sc-new-order-copy{flex:1;min-width:0} .sc-home-app .sc-new-order-copy strong,.sc-home-app .sc-new-order-copy small{display:block} .sc-home-app .sc-new-order-copy strong{font-size:14px;letter-spacing:.7px} .sc-home-app .sc-new-order-copy small{margin-top:4px;font-size:23px;font-weight:900} .sc-home-app .sc-new-order-arrow{font-size:34px;font-weight:300} .sc-home-app .sc-menu-title{margin:28px 4px 14px} .sc-home-app .sc-menu-title span{display:block;color:#2675b9;font-size:13px;font-weight:900;letter-spacing:.7px} .sc-home-app .sc-menu-title h2{margin:4px 0 0;color:#074c97;font-size:31px;line-height:1.1} .sc-home-app .sc-home-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px} .sc-home-app .sc-home-card{min-height:164px;position:relative;display:flex;flex-direction:column;align-items:flex-start;padding:18px;border:1px solid #d8e9f5;border-radius:16px;background:rgba(255,255,255,.92);box-shadow:0 7px 20px rgba(22,84,135,.07);color:#154e89;text-align:left;cursor:pointer;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease} .sc-home-app .sc-home-card:hover{transform:translateY(-2px);border-color:#b9dff5;box-shadow:0 12px 24px rgba(22,84,135,.11)} .sc-home-app .sc-home-card-icon{width:48px;height:48px;display:grid;place-items:center;margin-bottom:16px;border-radius:50%;background:linear-gradient(145deg,#e9f7ff,#d8f1ff);color:#0a78cc;font-size:24px;border:1px solid #c9e7f7} .sc-home-app .sc-home-card-text strong,.sc-home-app .sc-home-card-text small{display:block} .sc-home-app .sc-home-card-text strong{color:#084b91;font-size:16px} .sc-home-app .sc-home-card-text small{margin-top:5px;color:#4380b5;font-size:12px;line-height:1.3} .sc-home-app .sc-home-card-arrow{position:absolute;right:18px;bottom:15px;color:#146bb4;font-size:25px} .sc-home-app .sc-home-card.sc-admin-card{min-height:92px;flex-direction:row;align-items:center;padding:12px 18px} .sc-home-app .sc-home-card.sc-admin-card .sc-home-card-icon{margin:0 13px 0 0} .sc-home-app .sc-home-footer{padding:26px 0 4px;text-align:center;color:#1681d1;font-size:17px;font-weight:800;font-style:italic} .sc-home-app .sc-home-footer b{margin:0 5px;color:#72b632} .sc-home-app .bottom-nav{display:none} @media(max-width:1100px){.sc-home-app .sc-home-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.sc-home-app .sc-sidebar{width:190px;flex-basis:190px}.sc-home-app .sc-header-search{width:210px}} @media(max-width:800px){ .sc-home-app{min-height:100dvh;padding-bottom:76px} .sc-home-app .sc-app-header{height:70px;padding:8px 14px;position:relative} .sc-home-app .sc-header-menu{width:44px;height:44px} .sc-home-app .sc-header-brand img{width:150px;height:50px} .sc-home-app .sc-header-tools{margin-left:auto} .sc-home-app .sc-header-search,.sc-home-app .sc-header-tool{display:none} .sc-home-app .sc-header-user{border-left:0;margin:0;padding:0} .sc-home-app .sc-header-user>span:last-child{display:none} .sc-home-app .sc-app-layout{display:block;min-height:0} .sc-home-app .sc-sidebar{display:none} .sc-home-app .sc-main-area{width:100%} .sc-home-app .sc-main-area>.mobile-search{display:block;position:relative;margin:12px 14px 8px} .sc-home-app .mobile-search>span{position:absolute;left:15px;top:12px;z-index:2;font-size:20px} .sc-home-app .mobile-search input{width:100%;height:58px;box-sizing:border-box;border:1px solid #d5e5f1;border-radius:17px;background:rgba(248,252,255,.96);padding:0 16px 0 52px;color:#244c73;font-size:17px;outline:none;box-shadow:0 5px 16px rgba(21,77,122,.07)} .sc-home-app .sc-main-area>.quick-toolbar{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin:0 14px 8px;padding:7px;border:1px solid #dbeaf4;border-radius:17px;background:rgba(255,255,255,.94);box-shadow:0 6px 16px rgba(21,77,122,.06)} .sc-home-app .quick-toolbar button{min-width:0;height:52px;border:0;border-radius:13px;background:#f1f7fc;color:#145c9d;font-size:24px;cursor:pointer} .sc-home-app .quick-toolbar button span{display:none} .sc-home-app .sc-home-page{min-height:0;padding:8px 14px 25px;background:transparent} .sc-home-app .sc-welcome{min-height:0;margin:0 0 13px;padding:18px;border-radius:19px} .sc-home-app .sc-welcome h1{font-size:29px} .sc-home-app .sc-eyebrow{font-size:12px} .sc-home-app .sc-welcome-logo{width:110px;height:90px} .sc-home-app .sc-new-order{min-height:92px;padding:14px 16px;gap:13px;border-radius:17px} .sc-home-app .sc-new-order-icon{width:50px;height:50px;flex-basis:50px;font-size:25px} .sc-home-app .sc-new-order-copy strong{font-size:11px} .sc-home-app .sc-new-order-copy small{font-size:16px} .sc-home-app .sc-new-order-arrow{font-size:28px} .sc-home-app .sc-menu-title{margin:21px 2px 11px} .sc-home-app .sc-menu-title h2{font-size:25px} .sc-home-app .sc-home-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px} .sc-home-app .sc-home-card{min-height:145px;padding:14px;border-radius:16px} .sc-home-app .sc-home-card-icon{width:42px;height:42px;margin-bottom:12px;font-size:21px} .sc-home-app .sc-home-card-text strong{font-size:14px} .sc-home-app .sc-home-card-text small{font-size:11px} .sc-home-app .sc-home-card-arrow{right:13px;bottom:10px} .sc-home-app .sc-home-card.sc-admin-card{grid-column:1/-1;min-height:70px} .sc-home-app .sc-home-footer{padding-top:18px;font-size:14px} .sc-home-app .bottom-nav{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:50;grid-template-columns:repeat(4,1fr);height:76px;padding:6px 8px 5px;box-sizing:border-box;background:rgba(255,255,255,.97);border-top:1px solid #dceaf5;box-shadow:0 -5px 18px rgba(17,70,116,.08)} .sc-home-app .bottom-nav button{border:0;border-radius:16px;background:transparent;color:#21567f;font-size:21px;cursor:pointer} .sc-home-app .bottom-nav button span{display:block;margin-top:2px;font-size:11px;font-weight:800} .sc-home-app .bottom-nav button[data-page="home"]{background:#e6f4ff;color:#0872c7} } @media(max-width:420px){.sc-home-app .sc-header-brand img{width:132px}.sc-home-app .sc-welcome-logo{width:92px;height:78px}.sc-home-app .sc-welcome h1{font-size:26px}.sc-home-app .sc-home-card{min-height:138px}} `;
+
 function dashboardView(user) {
   currentUser = user;
-  app.innerHTML = ` <div class="mobile-app sc-app-shell"> <header class="sc-app-header"> <div class="sc-header-left"> <button class="icon-button sc-menu-button" id="menu-toggle" aria-label="Meni">☰</button> <button class="sc-header-brand" type="button" data-page="home" aria-label="Početna"> <img src="/logo-login.png" alt="Super Clean"> </button> </div> <div class="sc-header-search"> <span aria-hidden="true">⌕</span> <input id="global-search" placeholder="Pretraži..." aria-label="Pretraži"> </div> <div class="sc-header-tools"> <button class="sc-tool-button" data-action="add" aria-label="Dodaj">＋</button> <button class="sc-tool-button" data-action="remove" aria-label="Ukloni">♲</button> <button class="sc-tool-button" data-action="print" aria-label="Štampanje">▣</button> <button class="sc-tool-button" data-action="pdf" aria-label="PDF">▤</button> <button class="sc-tool-button" data-action="search" aria-label="Pretraga">⌕</button> <button class="sc-tool-button" id="more-actions-header" aria-label="Više">•••</button> <button class="sc-tool-user" id="user-menu" aria-label="Korisnik">●</button> <span class="sc-header-user">${escapeHtml( currentUser.firstName || "Korisnik" )}</span> </div> </header> <aside class="sc-sidebar" id="sc-sidebar"> ${renderSidebar()} </aside> <div class="sc-mobile-search"> <span aria-hidden="true">⌕</span> <input id="mobile-global-search" placeholder="Pretraži..." aria-label="Pretraži"> </div> <div class="sc-page-wrap"> <div class="quick-toolbar sc-quick-toolbar" aria-label="Brze radnje"> <button data-action="add">➕<span>Dodaj</span></button> <button data-action="remove">🗑️<span>Ukloni</span></button> <button data-action="print">🖨️<span>Print</span></button> <button data-action="pdf">📄<span>PDF</span></button> <button data-action="search">🔎<span>Pretraga</span></button> <button id="more-actions">⋯<span>Više</span></button> </div> <main id="page-content">${homeContent()}</main> </div> <nav class="bottom-nav sc-bottom-nav"> <button data-page="home">⌂<span>Početna</span></button> ${ hasPermission("orders.view") ? '<button data-page="orders">▣<span>Narudžbe</span></button>' : "" } ${ hasPermission("customers.view") ? '<button data-page="customers">♙<span>Kupci</span></button>' : "" } ${ user.role === "ADMIN" ? '<button data-page="admin">⚙<span>Admin</span></button>' : "" } </nav> <div id="drawer" class="drawer hidden"></div> <div id="modal-root"></div> <input id="excel-file" type="file" accept=".xlsx,.xls,.csv" class="hidden"> </div> `;
 
-  bindDashboard();
-  bindMobileSearch();
-  loadDashboard();
-}
+  const sidebarItems = mainMenu
+    .filter(([, , , permission]) => hasPermission(permission))
+    .map(([icon, title]) => ({ icon, title }));
 
-function renderSidebar() {
-  const items = [
-    ["home", "⌂", "Početna", true],
-    ["orders", "▣", "Narudžbe", hasPermission("orders.view")],
-    ["customers", "♙", "Kupci", hasPermission("customers.view")],
-    ["pricing", "◇", "Cjenovnik", hasPermission("pricing.view")],
-    ["labels", "▤", "Etikete", hasPermission("labels.view")],
-    ["qr", "⌗", "QR kod", hasPermission("qr.view")],
-    ["invoices", "▧", "Računi", hasPermission("invoices.view")],
-    ["reports", "▥", "Izvještaji", hasPermission("reports.view")],
-  ];
-
-  if (currentUser?.role === "ADMIN") {
-    items.push(["admin-divider", "", "", true]);
-    items.push(["admin", "⚙", "Administrator", true]);
-  }
-
-  return items
-    .filter(([, , , visible]) => visible)
-    .map(([page, icon, label]) => {
-      if (page === "admin-divider") {
-        return '<div class="sc-sidebar-divider"></div>';
-      }
-      return ` <button class="sc-sidebar-item ${ page === "home" ? "active" : "" }" data-page="${page}"> <span>${icon}</span> <strong>${escapeHtml(label)}</strong> </button> `;
-    })
-    .join("");
-}
-
-function bindMobileSearch() {
-  const input = document.getElementById("mobile-global-search");
-  const desktopInput = document.getElementById("global-search");
-  if (!input || !desktopInput) return;
-
-  input.addEventListener("input", () => {
-    desktopInput.value = input.value;
-    desktopInput.dispatchEvent(new Event("input", { bubbles: true }));
-  });
-
-  input.addEventListener("focus", () => desktopInput.focus());
-}
-
-function homeContent() {
-  const allItems = mainMenu.map(([icon, title, description, permission]) => ({
-    icon,
-    title,
-    description,
-    permission,
-    visible: hasPermission(permission),
-  }));
-
-  if (currentUser?.role === "ADMIN") {
-    allItems.push({
-      icon: "⚙",
-      title: "Administrator",
-      description: "Upravljanje aplikacijom",
-      permission: "admin.settings",
-      visible: true,
-    });
-  }
-
-  const layout = appConfig.homeLayout || {};
-  const order = Array.isArray(layout.order) ? layout.order : [];
-  const hidden = new Set(Array.isArray(layout.hidden) ? layout.hidden : []);
-
-  const ordered = [...allItems].sort((a, b) => {
-    const ai = order.indexOf(a.title);
-    const bi = order.indexOf(b.title);
-    return (ai < 0 ? 999 : ai) - (bi < 0 ? 999 : bi);
-  });
-
-  const menuItems = ordered.filter(
-    (item) => item.visible && !hidden.has(item.title)
-  );
-  const cards = menuItems
+  const sidebarHtml = sidebarItems
     .map(
-      (item) => ` <button class="sc-home-card" type="button" data-page-label="${escapeHtml( item.title )}"> <span class="sc-home-card-icon">${item.icon}</span> <span class="sc-home-card-text"> <strong>${escapeHtml(item.title)}</strong> <small>${escapeHtml(item.description)}</small> </span> <span class="sc-home-card-arrow" aria-hidden="true">→</span> </button> `
+      (item) => ` <button type="button" class="sc-sidebar-item" data-page-label="${escapeHtml( item.title )}"> <span class="sc-sidebar-icon">${item.icon}</span> <span>${escapeHtml(item.title)}</span> </button> `
     )
     .join("");
 
-  const roleName = currentUser?.roleName || currentUser?.role || "Korisnik";
+  const adminSidebar =
+    currentUser.role === "ADMIN"
+      ? ` <div class="sc-sidebar-divider"></div> <button type="button" class="sc-sidebar-item" data-page-label="Administrator"> <span class="sc-sidebar-icon">⚙️</span> <span>Administrator</span> </button> `
+      : "";
 
-  return ` <section class="sc-home-hero"> <div class="sc-home-welcome"> <span class="sc-home-eyebrow">DOBRO DOŠAO</span> <h1>${escapeHtml( currentUser?.firstName || "Korisnik" )} <span aria-hidden="true">👋</span></h1> <span class="sc-home-role">◈ ${escapeHtml(roleName)}</span> </div> <img class="sc-home-logo" src="/logo-login.png" alt="Super Clean Banja Luka"> </section> <button class="sc-home-new-order" type="button" data-page-label="Nova narudžba"> <span class="sc-home-new-order-icon">+</span> <span> <strong>NOVA NARUDŽBA</strong> <small>Brz prijem novog tepiha</small> </span> <b aria-hidden="true">→</b> </button> <section class="sc-home-menu"> <span class="sc-home-eyebrow">GLAVNI MENI</span> <h2>Šta želiš otvoriti?</h2> <div class="sc-home-grid">${cards}</div> </section> <footer class="sc-home-footer">Čist dom <b>•</b> Zdraviji život</footer> `;
+  app.innerHTML = ` <style id="sc-home-screen-style">${SC_HOME_SCREEN_STYLE}</style> <div class="mobile-app sc-home-app"> <header class="sc-app-header"> <button class="sc-header-menu" id="menu-toggle" type="button" aria-label="Meni">☰</button> <div class="sc-header-brand"> <img src="/logo-login.png" alt="Super Clean"> </div> <div class="sc-header-tools"> <label class="sc-header-search"> <span>🔎</span> <input id="global-search" placeholder="Pretraži..." aria-label="Pretraži"> </label> <button class="sc-header-tool" type="button" aria-label="Informacije">◉</button> <button class="sc-header-tool" type="button" data-action="remove" aria-label="Ukloni">🗑️</button> <button class="sc-header-tool" type="button" data-action="print" aria-label="Print">🖨️</button> <button class="sc-header-tool" type="button" data-action="pdf" aria-label="PDF">📄</button> <button class="sc-header-tool" type="button" data-action="search" aria-label="Pretraga">🔎</button> <button class="sc-header-tool" id="more-actions" type="button" aria-label="Više">•••</button> <button class="sc-header-user" id="user-menu" type="button" aria-label="Korisnik"> <span class="sc-header-user-icon">👤</span> <span>${escapeHtml( currentUser.firstName || "Korisnik" )}⌄</span> </button> </div> </header> <div class="sc-app-layout"> <aside class="sc-sidebar"> <nav class="sc-sidebar-nav" aria-label="Glavni meni"> <button type="button" class="sc-sidebar-item active" data-page="home"> <span class="sc-sidebar-icon">🏠</span> <span>Početna</span> </button> ${sidebarHtml} ${adminSidebar} </nav> </aside> <section class="sc-main-area"> <div class="mobile-search"> <span>🔎</span> <input id="global-search-mobile" placeholder="Pretraži..." aria-label="Pretraži"> </div> <div class="quick-toolbar" aria-label="Brze radnje"> <button data-action="add" type="button">➕<span>Dodaj</span></button> <button data-action="remove" type="button">🗑️<span>Ukloni</span></button> <button data-action="print" type="button">🖨️<span>Print</span></button> <button data-action="pdf" type="button">📄<span>PDF</span></button> <button data-action="search" type="button">🔎<span>Pretraga</span></button> <button id="more-actions-mobile" type="button">•••<span>Više</span></button> </div> <main id="page-content">${homeContent()}</main> </section> </div> <nav class="bottom-nav" aria-label="Mobilna navigacija"> <button data-page="home" type="button">🏠<span>Početna</span></button> ${ hasPermission("orders.view") ? '<button data-page="orders" type="button">📋<span>Narudžbe</span></button>' : "" } ${ hasPermission("customers.view") ? '<button data-page="customers" type="button">👥<span>Kupci</span></button>' : "" } ${ currentUser.role === "ADMIN" ? '<button data-page="admin" type="button">⚙️<span>Admin</span></button>' : "" } </nav> <div id="drawer" class="drawer hidden"></div> <div id="modal-root"></div> <input id="excel-file" type="file" accept=".xlsx,.xls,.csv" class="hidden"> </div> `;
+
+  bindDashboard();
+  loadDashboard();
+}
+
+function homeContent() {
+  const menuItems = mainMenu
+    .filter(([, , , permission]) => hasPermission(permission))
+    .filter(([, title]) => title !== "Nova narudžba")
+    .map(([icon, title, description]) => ({ icon, title, description }));
+
+  const cards = menuItems
+    .map(
+      (item) => ` <button class="sc-home-card" type="button" data-page-label="${escapeHtml( item.title )}"> <span class="sc-home-card-icon">${item.icon}</span> <span class="sc-home-card-text"> <strong>${escapeHtml(item.title)}</strong> <small>${escapeHtml(item.description)}</small> </span> <span class="sc-home-card-arrow" aria-hidden="true">›</span> </button> `
+    )
+    .join("");
+
+  const adminCard =
+    currentUser.role === "ADMIN"
+      ? ` <button class="sc-home-card sc-admin-card" type="button" data-page-label="Administrator"> <span class="sc-home-card-icon">⚙️</span> <span class="sc-home-card-text"> <strong>Administrator</strong> <small>Upravljanje aplikacijom</small> </span> <span class="sc-home-card-arrow" aria-hidden="true">›</span> </button> `
+      : "";
+
+  const firstName = currentUser.firstName || "Korisnik";
+  const roleName = currentUser.roleName || currentUser.role || "Korisnik";
+
+  return ` <section class="sc-home-page"> <section class="sc-welcome"> <div class="sc-welcome-copy"> <span class="sc-eyebrow">DOBRO DOŠAO</span> <h1>${escapeHtml(firstName)} 👋</h1> <span class="sc-role">🛡️ ${escapeHtml(roleName)}</span> </div> <img class="sc-welcome-logo" src="/logo-login.png" alt="Super Clean"> </section> <button class="sc-new-order" type="button" data-page-label="Nova narudžba"> <span class="sc-new-order-icon">＋</span> <span class="sc-new-order-copy"> <strong>NOVA NARUDŽBA</strong> <small>Brz prijem novog tepiha</small> </span> <span class="sc-new-order-arrow" aria-hidden="true">→</span> </button> <div class="sc-menu-title"> <span>GLAVNI MENI</span> <h2>Šta želiš otvoriti?</h2> </div> <div class="sc-home-grid"> <button class="sc-home-card" type="button" data-page-label="Nova narudžba"> <span class="sc-home-card-icon">＋</span> <span class="sc-home-card-text"> <strong>Nova narudžba</strong> <small>Brzo zaprimanje tepiha</small> </span> <span class="sc-home-card-arrow" aria-hidden="true">›</span> </button> ${cards} ${adminCard} </div> <footer class="sc-home-footer">Čist dom <b>•</b> Zdraviji život</footer> </section> `;
 }
 
 function dashboardSummaryContent(summary) {
@@ -1090,395 +994,27 @@ async function handleCustomerSubmit(event) {
 }
 
 function adminContent() {
-  return ` <section class="sc-admin-page"> <div class="sc-admin-heading"> <div> <span class="sc-home-eyebrow">ADMINISTRATORSKI CENTAR</span> <h1>Upravljanje Super Clean aplikacijom</h1> <p>Korisnici, dozvole, izgled, početni ekran, firma, vozila i sigurnost.</p> </div> <button class="secondary-button sc-admin-home-button" data-page="home">← Početna</button> </div> <div class="admin-tabs sc-admin-tabs"> <button class="active" data-admin-tab="overview">⌂ Pregled</button> <button data-admin-tab="users">👥 Korisnici</button> <button data-admin-tab="roles">🔐 Uloge</button> <button data-admin-tab="appearance">🎨 Izgled</button> <button data-admin-tab="home">🏠 Početni ekran</button> <button data-admin-tab="company">🏢 Firma</button> <button data-admin-tab="vehicles">🚚 Vozila</button> <button data-admin-tab="system">🛡️ Sistem</button> </div> <div id="admin-panel"></div> </section> `;
+  return ` <section class="page-panel"> <div class="panel-heading"> <div> <span class="eyebrow">ADMINISTRATORSKI CENTAR</span> <h2>Korisnici i dozvole</h2> </div> </div> <div class="admin-tabs"> <button class="active" data-admin-tab="users">👥 Korisnici</button> <button data-admin-tab="roles">🔐 Uloge i dozvole</button> <button data-admin-tab="system">🛡️ Sistem</button> </div> <div id="admin-panel"></div> </section> `;
 }
 
-function adminOverviewContent() {
-  const cards = [
-    ["👥", "Korisnici", "Korisnici i pristup aplikaciji", "users"],
-    ["🔐", "Uloge i dozvole", "Detaljna kontrola pristupa", "roles"],
-    [
-      "🎨",
-      "Izgled aplikacije",
-      "Themes, boje, veličine i dugmad",
-      "appearance",
-    ],
-    ["🏠", "Početni ekran", "Redoslijed i vidljivost funkcija", "home"],
-    ["🏢", "Podaci firme", "Memorandum i baza Super Clean", "company"],
-    ["💰", "Cjenovnik", "Usluge i cijene", "pricing"],
-    ["📋", "Narudžbe", "Pregled i upravljanje narudžbama", "orders"],
-    ["👤", "Kupci", "Podaci i istorija kupaca", "customers"],
-    ["🧾", "Računi", "Računi i fakture", "invoices"],
-    ["🚚", "Vozila / dostava", "Vozila za organizaciju dostave", "vehicles"],
-    ["📊", "Izvještaji", "Pregled poslovanja", "reports"],
-    ["💾", "Backup i restore", "Sigurna kopija poslovnih podataka", "system"],
-    ["📝", "Audit", "Evidencija aktivnosti", "system"],
-    ["🛡️", "Kontrola sistema", "Self-test i kontrola podataka", "system"],
-  ];
+function renderUsers(users) {
+  const rows = users
+    .map(
+      (user) => ` <article class="user-card selectable-record" data-record-type="user" data-record-id="${escapeHtml( user.id )}"> <div class="user-avatar">${escapeHtml( user.firstName.charAt(0) + user.lastName.charAt(0) )}</div> <div class="user-info"> <strong>${escapeHtml(user.firstName)} ${escapeHtml( user.lastName )}</strong> <span>@${escapeHtml(user.username)}</span> <span class="status ${user.isActive ? "active" : "inactive"}"> ${user.isActive ? "Aktivan" : "Neaktivan"} · ${escapeHtml( user.roleName )} </span> </div> <button class="edit-user" data-user-id="${ user.id }" aria-label="Izmijeni korisnika">✏️</button> </article> `
+    )
+    .join("");
 
-  return ` <section class="sc-admin-overview"> <div class="sc-admin-overview-intro"> <span class="sc-home-eyebrow">KONTROLNI CENTAR</span> <h2>Administrator</h2> <p>Administracija je odvojena od poslovnog rada. Gari ostaje zaseban modul.</p> </div> <div class="sc-admin-card-grid"> ${cards .map( ([icon, title, description, target]) => ` <button class="sc-admin-card" type="button" data-admin-page="${target}"> <span class="sc-admin-card-icon">${icon}</span> <span><strong>${escapeHtml( title )}</strong><small>${escapeHtml( description )}</small></span> <b>→</b> </button> ` ) .join("")} </div> </section> `;
+  return ` <button class="admin-add-button" id="add-user">➕ Dodaj korisnika</button> <div class="user-list">${ rows || '<div class="empty-state">Nema korisnika.</div>' }</div> `;
 }
 
-function adminAppearanceContent(config) {
-  const active = getTheme(config.activeTheme);
-  const themes = [...themeCatalog, ...(config.customThemes || [])];
+function renderRoles() {
+  const roleCards = rolesData
+    .map(
+      (role) => ` <article class="role-card selectable-record" data-record-type="role" data-record-id="${escapeHtml( role.code )}"> <div class="role-card-heading"> <div><strong>${escapeHtml( role.name )}</strong><small>${escapeHtml( role.description || "Bez opisa" )}</small></div> <button class="edit-role" data-role-code="${escapeHtml( role.code )}">✏️</button> </div> <div class="permission-summary">${ role.permissions.length } dozvola</div> </article> `
+    )
+    .join("");
 
-  return ` <section class="sc-admin-editor"> <div class="sc-admin-section-heading"> <div><span class="sc-home-eyebrow">THEMES</span><h2>Izgled aplikacije</h2><p>Aktivna tema i korisničke teme čuvaju se u bazi.</p></div> <button class="secondary-button" id="restore-default-theme">↺ Podrazumijevana</button> </div> <div class="sc-theme-active"> <div><small>AKTIVNA TEMA</small><strong>${escapeHtml( active.name )}</strong></div> <span class="sc-theme-swatch" style="--theme-primary:${ active.primary };--theme-accent:${active.accent}"></span> </div> <div class="sc-theme-grid"> ${themes .map( (theme) => ` <button type="button" class="sc-theme-card ${ theme.id === config.activeTheme ? "active" : "" }" data-theme-id="${escapeHtml(theme.id)}"> <span class="sc-theme-preview" style="--theme-primary:${ theme.primary };--theme-accent:${theme.accent};--theme-bg:${ theme.background }"><i></i><b></b><em></em></span> <strong>${escapeHtml(theme.name)}</strong> <small>${escapeHtml(theme.group || "Moje teme")}</small> </button> ` ) .join("")} </div> <div class="sc-builder"> <div class="sc-admin-section-heading"><div><span class="sc-home-eyebrow">THEME BUILDER</span><h2>Nova tema</h2></div><button class="secondary-button" id="duplicate-active-theme">Kopiraj aktivnu</button></div> <form id="theme-builder-form" class="sc-builder-form"> <label>Naziv teme<input name="name" required placeholder="Moja tema"></label> <label>Oblik prozora<select name="shape"><option value="rounded">Rounded</option><option value="glass">Glass</option><option value="soft">Soft</option><option value="sharp">Sharp</option><option value="floating">Floating</option><option value="compact">Compact</option><option value="large">Large Touch</option></select></label> <label>Primarna boja<input name="primary" type="color" value="${ active.primary }"></label> <label>Akcent boja<input name="accent" type="color" value="${ active.accent }"></label> <label>Pozadina<input name="background" type="color" value="${ active.background }"></label> <label>Boja teksta<input name="text" type="color" value="${ active.text }"></label> <label>Veličina<select name="size"><option value="small">Mala</option><option value="normal" selected>Normalna</option><option value="large">Velika</option></select></label> <label>Sjene<select name="shadows"><option value="none">Bez</option><option value="subtle" selected>Blage</option><option value="strong">Jake</option></select></label> <label>Dugmad<select name="buttons"><option value="classic">Classic</option><option value="rounded" selected>Rounded</option><option value="pill">Pill</option><option value="glass">Glass</option></select></label> <div class="sc-builder-preview" id="theme-builder-preview"><span>Pregled</span><strong>Super Clean</strong><button type="button">Nova narudžba</button></div> <button class="primary-button" type="submit">Sačuvaj novu temu</button> </form> </div> </section> `;
-}
-
-function adminHomeEditorContent(config) {
-  const items = mainMenu.map(([icon, title, description, permission]) => ({
-    icon,
-    title,
-    description,
-    permission,
-  }));
-  items.push({
-    icon: "⚙",
-    title: "Administrator",
-    description: "Upravljanje aplikacijom",
-    permission: "admin.settings",
-  });
-  const layout = config.homeLayout || {};
-  const hidden = new Set(layout.hidden || []);
-  const order = Array.isArray(layout.order) ? layout.order : [];
-  items.sort(
-    (a, b) =>
-      (order.indexOf(a.title) < 0 ? 999 : order.indexOf(a.title)) -
-      (order.indexOf(b.title) < 0 ? 999 : order.indexOf(b.title))
-  );
-
-  return ` <section class="sc-admin-editor"> <div class="sc-admin-section-heading"><div><span class="sc-home-eyebrow">POČETNI EKRAN</span><h2>Redoslijed i vidljivost</h2><p>Odaberi koje funkcije se prikazuju i pomjeraj ih gore ili dolje.</p></div></div> <div class="sc-home-layout-list"> ${items .map( (item, index) => ` <article class="sc-home-layout-row" data-home-title="${escapeHtml( item.title )}"> <span class="sc-home-layout-icon">${item.icon}</span> <div><strong>${escapeHtml( item.title )}</strong><small>${escapeHtml( item.description )}</small></div> <label class="sc-visibility"><input type="checkbox" data-home-visible ${ hidden.has(item.title) ? "" : "checked" }><span>Prikaži</span></label> <button type="button" class="sc-move-home" data-home-move="-1" ${ index === 0 ? "disabled" : "" }>↑</button> <button type="button" class="sc-move-home" data-home-move="1" ${ index === items.length - 1 ? "disabled" : "" }>↓</button> </article> ` ) .join("")} </div> <button class="primary-button" id="save-home-layout">Sačuvaj početni ekran</button> </section> `;
-}
-
-function adminCompanyContent(data) {
-  const m = data.memorandum || {};
-  const c = data.baseCoordinates || {};
-  return ` <section class="sc-admin-editor"> <div class="sc-admin-section-heading"><div><span class="sc-home-eyebrow">PODACI FIRME</span><h2>Memorandum i baza</h2><p>Podaci se koriste na računima i dokumentima.</p></div></div> <form id="memorandum-form" class="sc-builder-form"> <label>Naziv firme<input name="companyName" value="${escapeHtml( m.companyName || "" )}" required></label> <label>Adresa<input name="address" value="${escapeHtml( m.address || "" )}"></label> <label>Telefon<input name="phone" value="${escapeHtml( m.phone || "" )}"></label> <label>E-mail<input name="email" type="email" value="${escapeHtml( m.email || "" )}"></label> <label>Web<input name="website" value="${escapeHtml( m.website || "" )}"></label> <label>Širina baze<input name="baseLatitude" value="${escapeHtml( c.latitude ?? "" )}" inputmode="decimal"></label> <label>Dužina baze<input name="baseLongitude" value="${escapeHtml( c.longitude ?? "" )}" inputmode="decimal"></label> <button class="primary-button" type="submit">Sačuvaj podatke firme</button> </form> </section> `;
-}
-
-async function loadAdminVehicles() {
-  const data = await api("/api/routes/vehicles");
-  const panel = document.getElementById("admin-panel");
-  if (!panel) return;
-  panel.innerHTML = ` <section class="sc-admin-editor"> <div class="sc-admin-section-heading"><div><span class="sc-home-eyebrow">VOZILA / DOSTAVA</span><h2>Vozila</h2><p>Upravljanje vozilima za dostavu.</p></div><button class="admin-add-button" id="add-admin-vehicle">➕ Dodaj vozilo</button></div> <div class="sc-vehicle-list"> ${ data.vehicles .map( (v) => `<article class="sc-vehicle-row"><span>🚚</span><div><strong>${escapeHtml( v.name )}</strong><small>Redoslijed ${escapeHtml( v.sort_order )}</small></div><button class="edit-admin-vehicle" data-vehicle-id="${escapeHtml( v.id )}" data-vehicle-name="${escapeHtml( v.name )}">✏️</button></article>` ) .join("") || '<div class="empty-state">Nema aktivnih vozila.</div>' } </div> </section> `;
-  document
-    .getElementById("add-admin-vehicle")
-    ?.addEventListener("click", () => {
-      const name = window.prompt("Naziv vozila:");
-      if (name?.trim()) saveAdminVehicle(null, name.trim());
-    });
-  panel.querySelectorAll(".edit-admin-vehicle").forEach((button) =>
-    button.addEventListener("click", () => {
-      const name = window.prompt("Naziv vozila:", button.dataset.vehicleName);
-      if (name?.trim()) saveAdminVehicle(button.dataset.vehicleId, name.trim());
-    })
-  );
-}
-
-async function saveAdminVehicle(id, name) {
-  try {
-    await api(id ? `/api/routes/vehicles/${id}` : "/api/routes/vehicles", {
-      method: id ? "PATCH" : "POST",
-      body: JSON.stringify({ name, isActive: true }),
-    });
-    await loadAdminVehicles();
-  } catch (error) {
-    window.alert(error.message);
-  }
-}
-
-function getTheme(id) {
-  return (
-    themeCatalog.find((theme) => theme.id === id) ||
-    (appConfig.customThemes || []).find((theme) => theme.id === id) ||
-    themeCatalog[0]
-  );
-}
-
-function applyTheme(theme) {
-  const root = document.documentElement;
-  root.style.setProperty("--sc-primary", theme.primary);
-  root.style.setProperty("--sc-accent", theme.accent);
-  root.style.setProperty("--sc-background", theme.background);
-  root.style.setProperty("--sc-text", theme.text);
-  root.style.setProperty("--sc-surface", theme.surface || "#fff");
-  root.style.setProperty(
-    "--sc-radius",
-    theme.shape === "sharp"
-      ? "8px"
-      : theme.shape === "compact"
-      ? "12px"
-      : "22px"
-  );
-  root.style.setProperty(
-    "--sc-shadow",
-    theme.shadows === "none"
-      ? "none"
-      : theme.shadows === "strong"
-      ? "0 18px 42px rgba(20,55,100,.16)"
-      : "0 8px 24px rgba(20,55,100,.08)"
-  );
-  root.style.setProperty("--blue", theme.primary);
-  root.style.setProperty("--blue-dark", theme.primary);
-  root.style.setProperty("--green", theme.accent);
-  root.style.setProperty("--background", theme.background);
-  root.style.setProperty("--surface", theme.surface || "#fff");
-  root.style.setProperty("--text", theme.text);
-  root.dataset.scTheme = theme.id;
-}
-
-async function loadAppConfig() {
-  try {
-    const data = await api("/api/app-config");
-    appConfig = {
-      ...appConfig,
-      ...data,
-      customThemes: data.customThemes || [],
-      homeLayout: data.homeLayout || appConfig.homeLayout,
-    };
-    applyTheme(getTheme(appConfig.activeTheme));
-  } catch {
-    applyTheme(getTheme(appConfig.activeTheme));
-  }
-}
-
-async function saveAdminConfig(patch) {
-  const data = await api("/api/admin/app-config", {
-    method: "PUT",
-    body: JSON.stringify(patch),
-  });
-  appConfig = {
-    ...appConfig,
-    ...data,
-    customThemes: data.customThemes || [],
-    homeLayout: data.homeLayout || appConfig.homeLayout,
-  };
-  applyTheme(getTheme(appConfig.activeTheme));
-  return data;
-}
-
-function bindAdminOverview() {
-  document.querySelectorAll("[data-admin-page]").forEach((button) =>
-    button.addEventListener("click", () => {
-      const target = button.dataset.adminPage;
-      if (
-        ["pricing", "orders", "customers", "invoices", "reports"].includes(
-          target
-        )
-      )
-        navigate(target);
-      else showAdminTab(target);
-    })
-  );
-}
-
-function bindAppearanceActions() {
-  document.querySelectorAll("[data-theme-id]").forEach((button) =>
-    button.addEventListener("click", async () => {
-      try {
-        await saveAdminConfig({ activeTheme: button.dataset.themeId });
-        await showAdminTab("appearance");
-      } catch (error) {
-        window.alert(error.message);
-      }
-    })
-  );
-  document
-    .getElementById("restore-default-theme")
-    ?.addEventListener("click", async () => {
-      try {
-        await saveAdminConfig({ activeTheme: appConfig.defaultTheme });
-        await showAdminTab("appearance");
-      } catch (error) {
-        window.alert(error.message);
-      }
-    });
-  document
-    .getElementById("duplicate-active-theme")
-    ?.addEventListener("click", async () => {
-      const active = getTheme(appConfig.activeTheme);
-      try {
-        await saveAdminConfig({
-          customTheme: {
-            ...active,
-            id: `custom-${Date.now()}`,
-            name: `${active.name} kopija`,
-            group: "Moje teme",
-          },
-        });
-        await showAdminTab("appearance");
-      } catch (error) {
-        window.alert(error.message);
-      }
-    });
-  const form = document.getElementById("theme-builder-form");
-  const preview = document.getElementById("theme-builder-preview");
-  if (!form || !preview) return;
-  const update = () => {
-    preview.style.setProperty("--preview-primary", form.primary.value);
-    preview.style.setProperty("--preview-accent", form.accent.value);
-    preview.style.setProperty("--preview-background", form.background.value);
-    preview.style.setProperty("--preview-text", form.text.value);
-  };
-  form
-    .querySelectorAll("input, select")
-    .forEach((input) => input.addEventListener("input", update));
-  update();
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const data = Object.fromEntries(new FormData(form).entries());
-    const theme = {
-      id: `custom-${Date.now()}`,
-      name: String(data.name).trim(),
-      group: "Moje teme",
-      primary: data.primary,
-      accent: data.accent,
-      background: data.background,
-      text: data.text,
-      surface: "#ffffff",
-      shape: data.shape,
-      size: data.size,
-      shadows: data.shadows,
-      buttons: data.buttons,
-    };
-    if (!theme.name) return;
-    try {
-      await saveAdminConfig({ customTheme: theme, activeTheme: theme.id });
-      await showAdminTab("appearance");
-    } catch (error) {
-      window.alert(error.message);
-    }
-  });
-}
-
-function bindHomeEditorActions() {
-  document.querySelectorAll(".sc-move-home").forEach((button) =>
-    button.addEventListener("click", () => {
-      const row = button.closest(".sc-home-layout-row");
-      const direction = Number(button.dataset.homeMove);
-      const sibling =
-        direction < 0 ? row.previousElementSibling : row.nextElementSibling;
-      if (!sibling) return;
-      if (direction < 0) sibling.before(row);
-      else sibling.after(row);
-      const rows = [...document.querySelectorAll(".sc-home-layout-row")];
-      rows.forEach((item, index) => {
-        item.querySelector('[data-home-move="-1"]').disabled = index === 0;
-        item.querySelector('[data-home-move="1"]').disabled =
-          index === rows.length - 1;
-      });
-    })
-  );
-  document
-    .getElementById("save-home-layout")
-    ?.addEventListener("click", async () => {
-      const rows = [...document.querySelectorAll(".sc-home-layout-row")];
-      const order = rows.map((row) => row.dataset.homeTitle);
-      const hidden = rows
-        .filter((row) => !row.querySelector("[data-home-visible]").checked)
-        .map((row) => row.dataset.homeTitle);
-      try {
-        await saveAdminConfig({ homeLayout: { order, hidden } });
-        window.alert("Početni ekran je sačuvan.");
-      } catch (error) {
-        window.alert(error.message);
-      }
-    });
-}
-
-function bindCompanyActions() {
-  document
-    .getElementById("memorandum-form")
-    ?.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const form = event.currentTarget;
-      try {
-        await api("/api/admin/memorandum", {
-          method: "PUT",
-          body: JSON.stringify(
-            Object.fromEntries(new FormData(form).entries())
-          ),
-        });
-        window.alert("Podaci firme su sačuvani.");
-      } catch (error) {
-        window.alert(error.message);
-      }
-    });
-}
-
-async function showAdminTab(tab) {
-  activeAdminTab = tab;
-  clearSelectedRecord();
-  const panel = document.getElementById("admin-panel");
-  if (!panel) return;
-  document
-    .querySelectorAll("[data-admin-tab]")
-    .forEach((button) =>
-      button.classList.toggle("active", button.dataset.adminTab === tab)
-    );
-  try {
-    if (tab === "overview") {
-      panel.innerHTML = adminOverviewContent();
-      bindAdminOverview();
-      return;
-    }
-    if (tab === "users") {
-      if (!rolesData.length) await loadAdminData();
-      const data = await api("/api/admin/users");
-      panel.innerHTML = renderUsers(data.users);
-      bindUserActions();
-      return;
-    }
-    if (tab === "roles") {
-      if (!rolesData.length) await loadAdminData();
-      panel.innerHTML = renderRoles();
-      bindRoleActions();
-      return;
-    }
-    if (tab === "appearance") {
-      const config = await api("/api/admin/app-config");
-      appConfig = {
-        ...appConfig,
-        ...config,
-        customThemes: config.customThemes || [],
-        homeLayout: config.homeLayout || appConfig.homeLayout,
-      };
-      panel.innerHTML = adminAppearanceContent(appConfig);
-      bindAppearanceActions();
-      return;
-    }
-    if (tab === "home") {
-      const config = await api("/api/admin/app-config");
-      appConfig = {
-        ...appConfig,
-        ...config,
-        customThemes: config.customThemes || [],
-        homeLayout: config.homeLayout || appConfig.homeLayout,
-      };
-      panel.innerHTML = adminHomeEditorContent(appConfig);
-      bindHomeEditorActions();
-      return;
-    }
-    if (tab === "company") {
-      panel.innerHTML =
-        '<div class="dashboard-loading">Učitavam podatke firme...</div>';
-      const data = await api("/api/admin/memorandum");
-      panel.innerHTML = adminCompanyContent(data);
-      bindCompanyActions();
-      return;
-    }
-    if (tab === "vehicles") {
-      await loadAdminVehicles();
-      return;
-    }
-    if (tab === "system") {
-      panel.innerHTML = adminSystemLoadingContent();
-      await loadAdminSystem();
-    }
-  } catch (error) {
-    panel.innerHTML = `<div class="error">${escapeHtml(error.message)}</div>`;
-  }
+  return ` <button class="admin-add-button" id="add-role">➕ Dodaj ulogu</button> <div class="role-list">${roleCards}</div> `;
 }
 
 function userForm(user = null) {
@@ -1525,7 +1061,35 @@ async function loadAdminData() {
   return usersData.users;
 }
 
-async function adminSystemLoadingContent() {
+async function showAdminTab(tab) {
+  activeAdminTab = tab;
+  clearSelectedRecord();
+  const panel = document.getElementById("admin-panel");
+  if (!panel) return;
+
+  document.querySelectorAll(".admin-tabs button").forEach((button) => {
+    button.classList.toggle("active", button.dataset.adminTab === tab);
+  });
+
+  try {
+    if (!rolesData.length) await loadAdminData();
+    if (tab === "users") {
+      const data = await api("/api/admin/users");
+      panel.innerHTML = renderUsers(data.users);
+      bindUserActions();
+    } else if (tab === "roles") {
+      panel.innerHTML = renderRoles();
+      bindRoleActions();
+    } else {
+      panel.innerHTML = adminSystemLoadingContent();
+      await loadAdminSystem();
+    }
+  } catch (error) {
+    panel.innerHTML = `<div class="error">${escapeHtml(error.message)}</div>`;
+  }
+}
+
+function adminSystemLoadingContent() {
   return ` <div class="system-loading"> <div class="dashboard-loading">Učitavam sigurnost sistema...</div> </div> `;
 }
 
@@ -1974,15 +1538,9 @@ async function handleModalClick(event) {
 }
 
 function bindDashboard() {
-  document
-    .querySelectorAll(
-      ".bottom-nav button, .sc-sidebar-item, [data-page='home'], .sc-header-brand, .sc-admin-home-button"
-    )
-    .forEach((button) => {
-      button.addEventListener("click", () =>
-        navigate(button.dataset.page || "home")
-      );
-    });
+  document.querySelectorAll(".bottom-nav button").forEach((button) => {
+    button.addEventListener("click", () => navigate(button.dataset.page));
+  });
 
   document.querySelectorAll("[data-page-label]").forEach((button) => {
     button.addEventListener("click", () =>
@@ -1990,8 +1548,32 @@ function bindDashboard() {
     );
   });
 
+  document.querySelectorAll(".sc-sidebar-item").forEach((button) => {
+    button.addEventListener("click", () => {
+      document
+        .querySelectorAll(".sc-sidebar-item")
+        .forEach((item) => item.classList.remove("active"));
+      button.classList.add("active");
+      if (button.dataset.page) {
+        navigate(button.dataset.page);
+      } else {
+        navigateByLabel(button.dataset.pageLabel);
+      }
+    });
+  });
+
+  document.querySelectorAll(".quick-toolbar button").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (button.id === "more-actions-mobile") {
+        openMoreActions();
+        return;
+      }
+      handleToolbarAction(button.dataset.action);
+    });
+  });
+
   document
-    .querySelectorAll(".quick-toolbar button, .sc-header-tools [data-action]")
+    .querySelectorAll(".sc-header-tool[data-action]")
     .forEach((button) => {
       button.addEventListener("click", () =>
         handleToolbarAction(button.dataset.action)
@@ -2001,36 +1583,50 @@ function bindDashboard() {
   document
     .getElementById("more-actions")
     ?.addEventListener("click", openMoreActions);
-  document
-    .getElementById("more-actions-header")
-    ?.addEventListener("click", openMoreActions);
   document.getElementById("menu-toggle")?.addEventListener("click", openDrawer);
   document.getElementById("user-menu")?.addEventListener("click", openUserMenu);
 
+  const desktopSearch = document.getElementById("global-search");
+  const mobileSearch = document.getElementById("global-search-mobile");
+
+  const focusSearch = (input) => input?.focus();
+
   document
-    .getElementById("global-search")
-    ?.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        const firstResult = document.querySelector(".global-search-result");
-        if (firstResult) firstResult.click();
-      }
+    .querySelectorAll('.sc-header-tool[aria-label="Pretraga"]')
+    .forEach((button) => {
+      button.addEventListener("click", () => focusSearch(desktopSearch));
     });
 
+  document
+    .querySelectorAll('.quick-toolbar button[data-action="search"]')
+    .forEach((button) => {
+      button.addEventListener("click", () => focusSearch(mobileSearch));
+    });
+
+  const handleSearchEnter = (event) => {
+    if (event.key !== "Enter") return;
+    document.querySelector(".global-search-result")?.click();
+  };
+
+  desktopSearch?.addEventListener("keydown", handleSearchEnter);
+  mobileSearch?.addEventListener("keydown", handleSearchEnter);
+
   bindGlobalSearch();
+
+  mobileSearch?.addEventListener("input", () => {
+    if (desktopSearch) desktopSearch.value = mobileSearch.value;
+    clearTimeout(globalSearchTimer);
+    globalSearchTimer = setTimeout(
+      () => runGlobalSearch(mobileSearch.value),
+      250
+    );
+  });
+
   document
     .getElementById("modal-root")
     ?.addEventListener("click", handleModalClick);
+  navigate("home");
 }
-
-const orderStatusNames = {
-  RECEIVED: "Zaprimljeno",
-  WASHING: "Na pranju",
-  DRYING: "Sušenje",
-  READY: "Spremno",
-  DELIVERED: "Isporučeno",
-  PAID: "Plaćeno",
-  CANCELLED: "Otkazano",
-};
 
 function todayIso() {
   const date = new Date();
@@ -2478,14 +2074,6 @@ async function handlePriceSubmit(event) {
 
 async function navigate(page) {
   currentPage = page;
-  document.querySelectorAll(".sc-sidebar-item").forEach((button) => {
-    button.classList.toggle("active", button.dataset.page === page);
-  });
-  document
-    .querySelectorAll(".bottom-nav button[data-page]")
-    .forEach((button) => {
-      button.classList.toggle("active", button.dataset.page === page);
-    });
   clearSelectedRecord();
   const content = document.getElementById("page-content");
   if (page === "home") {
@@ -2497,8 +2085,8 @@ async function navigate(page) {
   if (page === "admin" && currentUser.role === "ADMIN") {
     content.innerHTML = adminContent();
     rolesData = [];
+    await showAdminTab("users");
     bindAdminTabs();
-    await showAdminTab("overview");
     return;
   }
 
@@ -3054,7 +2642,6 @@ async function handleLogin(event) {
         password: form.password.value,
       }),
     });
-    await loadAppConfig();
     dashboardView(data.user);
     await openPendingQrTarget();
   } catch (error) {
@@ -3088,7 +2675,6 @@ async function openPendingQrTarget() {
 async function loadSession() {
   try {
     const data = await api("/api/me");
-    await loadAppConfig();
     dashboardView(data.user);
     await openPendingQrTarget();
   } catch {
