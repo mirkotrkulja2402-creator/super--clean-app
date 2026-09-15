@@ -128,7 +128,7 @@ function loginView(error = "") {
         <main class="sc-login-screen">
             <section class="sc-login-card">
                 <div class="sc-login-brand">
-                    <img class="sc-login-logo" src="/logo-login.png" alt="Super Clean Banja Luka">
+                    <img class="sc-login-logo" src="/logo-login-start.png" alt="Super Clean Banja Luka">
                     <h1>Super Clean</h1>
                     <p>Banja Luka · poslovna aplikacija</p>
                 </div>
@@ -173,7 +173,7 @@ function loginView(error = "") {
                     </div>
                 </form>
 
-                <footer class="sc-login-footer">Čist dom <i>•</i> Zdraviji život</footer>
+                <footer class="sc-login-footer"><img class="sc-login-footer-logo" src="/logo-login-start.png" alt="" aria-hidden="true"><span>Čist dom <i>•</i> Zdraviji život</span></footer>
             </section>
         </main>
     `;

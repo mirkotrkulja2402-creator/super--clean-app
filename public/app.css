@@ -5549,3 +5549,118 @@ select,
 textarea {
     touch-action: manipulation;
 }
+
+/* FINAL LOGIN START: keep the supplied round logo fully visible and add a small brand mark to the slogan. */
+.sc-login-screen {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+.sc-login-card {
+    box-sizing: border-box;
+    max-width: min(820px, 100%);
+}
+
+.sc-login-brand {
+    width: 100%;
+    min-width: 0;
+}
+
+.sc-login-logo {
+    width: min(260px, 58vw);
+    height: auto;
+    aspect-ratio: 1 / 1;
+    max-width: 260px;
+    max-height: 260px;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 50%;
+    margin-inline: auto;
+}
+
+.sc-login-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sc-login-footer-logo {
+    display: block;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    max-width: 42px;
+    max-height: 42px;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 50%;
+}
+
+@media (max-width: 560px) {
+    .sc-login-logo {
+        width: min(220px, 58vw);
+        max-width: 220px;
+        max-height: 220px;
+    }
+
+    .sc-login-footer {
+        gap: 8px;
+        font-size: 17px;
+    }
+
+    .sc-login-footer-logo {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+        max-width: 36px;
+        max-height: 36px;
+    }
+}
+
+/* Start-screen stability: keep the login viewport fixed on touch devices. */
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+    touch-action: pan-y;
+}
+
+.sc-login-screen {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+}
+
+.sc-login-logo {
+    width: min(290px, 58vw);
+    height: min(290px, 58vw);
+    max-width: 290px;
+    max-height: 290px;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 50%;
+}
+
+.sc-login-footer-logo {
+    border-radius: 50%;
+}
+
+@media (max-width: 560px) {
+    .sc-login-logo {
+        width: min(220px, 58vw);
+        height: min(220px, 58vw);
+        max-width: 220px;
+        max-height: 220px;
+    }
+}
