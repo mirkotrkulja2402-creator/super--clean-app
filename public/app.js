@@ -123,60 +123,132 @@ function scIcon(name, className = "") {
     return `<span class="sc-svg-icon ${escapeHtml(className)}">${svg}</span>`;
 }
 
+
+const DEFAULT_LOGIN_SETTINGS = {
+    logoSrc: "/logo-login-start.png",
+    title: "Super Clean",
+    subtitle: "Banja Luka · poslovna aplikacija",
+    usernameLabel: "Korisničko ime",
+    usernamePlaceholder: "Unesite korisničko ime",
+    passwordLabel: "Šifra",
+    passwordPlaceholder: "Unesite šifru",
+    rememberVisible: true,
+    rememberDefault: true,
+    changeUserVisible: true,
+    passwordToggleVisible: true,
+    secureVisible: true,
+    secureText: "Sigurna prijava",
+    footerLogoVisible: true,
+    footerText: "Čist dom • Zdraviji život",
+    primaryButtonText: "PRIJAVI SE",
+    titleColor: "#123b63",
+    textColor: "#36516b",
+    accentColor: "#1d6fa8",
+    backgroundColor: "#eef8ff",
+    cardColor: "#ffffff",
+    autoLogin: true,
+};
+
+let loginSettings = { ...DEFAULT_LOGIN_SETTINGS };
+
+function normalizeLoginSettings(value = {}) {
+    const settings = { ...DEFAULT_LOGIN_SETTINGS, ...(value && typeof value === "object" ? value : {}) };
+    const colors = ["titleColor", "textColor", "accentColor", "backgroundColor", "cardColor"];
+    for (const key of colors) {
+        if (!/^#[0-9a-fA-F]{6}$/.test(String(settings[key] || ""))) {
+            settings[key] = DEFAULT_LOGIN_SETTINGS[key];
+        }
+    }
+    if (typeof settings.logoSrc !== "string" || !(
+        settings.logoSrc.startsWith("/") || settings.logoSrc.startsWith("data:image/")
+    )) {
+        settings.logoSrc = DEFAULT_LOGIN_SETTINGS.logoSrc;
+    }
+    return settings;
+}
+
+async function loadLoginSettings() {
+    try {
+        const data = await api("/api/login-settings");
+        loginSettings = normalizeLoginSettings(data.settings);
+    } catch {
+        loginSettings = { ...DEFAULT_LOGIN_SETTINGS };
+    }
+    return loginSettings;
+}
+
+function applyLoginSettings() {
+    const page = document.querySelector(".sc-login-screen");
+    if (!page) return;
+    page.style.setProperty("--sc-login-title-color", loginSettings.titleColor);
+    page.style.setProperty("--sc-login-text-color", loginSettings.textColor);
+    page.style.setProperty("--sc-login-accent-color", loginSettings.accentColor);
+    page.style.setProperty("--sc-login-background", loginSettings.backgroundColor);
+    page.style.setProperty("--sc-login-card", loginSettings.cardColor);
+}
+
 function loginView(error = "") {
     app.innerHTML = `
         <main class="sc-login-screen">
             <section class="sc-login-card">
                 <div class="sc-login-brand">
-                    <img class="sc-login-logo" src="/logo-login-start.png" alt="Super Clean Banja Luka">
-                    <h1>Super Clean</h1>
-                    <p>Banja Luka · poslovna aplikacija</p>
+                    <img class="sc-login-logo" src="${escapeHtml(loginSettings.logoSrc)}" alt="Super Clean Banja Luka">
+                    <h1>${escapeHtml(loginSettings.title)}</h1>
+                    <p>${escapeHtml(loginSettings.subtitle)}</p>
                 </div>
 
                 <div id="login-error" class="sc-login-error${error ? "" : " hidden"}">${escapeHtml(error)}</div>
 
                 <form id="login-form" class="sc-login-form" novalidate>
                     <label class="sc-login-field">
-                        <span>${scIcon("customers")} Korisničko ime</span>
+                        <span>${scIcon("customers")} ${escapeHtml(loginSettings.usernameLabel)}</span>
                         <div class="sc-login-input-wrap">
-                            <input name="username" autocomplete="username" placeholder="Unesite korisničko ime" required autofocus>
+                            <input name="username" autocomplete="username" placeholder="${escapeHtml(loginSettings.usernamePlaceholder)}" required autofocus>
                         </div>
                     </label>
 
                     <label class="sc-login-field">
-                        <span>${scIcon("admin")} Šifra</span>
+                        <span>${scIcon("admin")} ${escapeHtml(loginSettings.passwordLabel)}</span>
                         <div class="sc-login-input-wrap">
-                            <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Unesite šifru" required>
-                            <button type="button" class="sc-password-toggle" id="password-toggle" aria-label="Prikaži šifru" aria-pressed="false">${scIcon("eye")}</button>
+                            <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="${escapeHtml(loginSettings.passwordPlaceholder)}" required>
+                            ${loginSettings.passwordToggleVisible ? `<button type="button" class="sc-password-toggle" id="password-toggle" aria-label="Prikaži šifru" aria-pressed="false">${scIcon("eye")}</button>` : ""}
                         </div>
                     </label>
 
+                    ${loginSettings.rememberVisible || loginSettings.changeUserVisible ? `
                     <div class="sc-login-options">
+                        ${loginSettings.rememberVisible ? `
                         <label class="sc-remember">
-                            <input id="remember-device" type="checkbox" checked>
+                            <input id="remember-device" type="checkbox" ${loginSettings.rememberDefault ? "checked" : ""}>
                             <span class="sc-checkmark">✓</span>
                             <span>Zapamti me na ovom uređaju</span>
-                        </label>
-
+                        </label>` : ""}
+                        ${loginSettings.changeUserVisible ? `
                         <button type="button" class="sc-change-user" id="change-user-button">
                             ${scIcon("userSwitch")} <span>Promijeni korisnika</span>
-                        </button>
-                    </div>
+                        </button>` : ""}
+                    </div>` : ""}
 
                     <button class="sc-login-submit" id="login-button" type="submit">
-                        <span>PRIJAVI SE</span>
+                        <span>${escapeHtml(loginSettings.primaryButtonText)}</span>
                         <b>→</b>
                     </button>
 
+                    ${loginSettings.secureVisible ? `
                     <div class="sc-login-secure">
-                        ${scIcon("admin")} <span>Sigurna prijava</span>
-                    </div>
+                        ${scIcon("admin")} <span>${escapeHtml(loginSettings.secureText)}</span>
+                    </div>` : ""}
                 </form>
 
-                <footer class="sc-login-footer"><img class="sc-login-footer-logo" src="/logo-login-start.png" alt="" aria-hidden="true"><span>Čist dom <i>•</i> Zdraviji život</span></footer>
+                <footer class="sc-login-footer">
+                    ${loginSettings.footerLogoVisible ? `<img class="sc-login-footer-logo" src="${escapeHtml(loginSettings.logoSrc)}" alt="" aria-hidden="true">` : ""}
+                    <span>${escapeHtml(loginSettings.footerText)}</span>
+                </footer>
             </section>
         </main>
     `;
+
+    applyLoginSettings();
 
     const form = document.getElementById("login-form");
     form?.addEventListener("submit", handleLogin);
@@ -189,7 +261,6 @@ function loginView(error = "") {
     document.getElementById("change-user-button")?.addEventListener("click", () => {
         const usernameInput = form?.elements.namedItem("username");
         const passwordInput = form?.elements.namedItem("password");
-
         if (usernameInput instanceof HTMLInputElement) usernameInput.value = "";
         if (passwordInput instanceof HTMLInputElement) passwordInput.value = "";
         usernameInput?.focus();
@@ -205,9 +276,8 @@ function loginView(error = "") {
         button.setAttribute("aria-label", visible ? "Prikaži šifru" : "Sakrij šifru");
         button.setAttribute("aria-pressed", String(!visible));
     });
-
-    document.getElementById("change-user-button")?.addEventListener("click", logout);
 }
+
 
 function dashboardView(user) {
     currentUser = user;
@@ -1546,6 +1616,7 @@ function adminContent() {
             <div class="admin-tabs">
                 <button class="active" data-admin-tab="users">👥 Korisnici</button>
                 <button data-admin-tab="roles">🔐 Uloge i dozvole</button>
+                <button data-admin-tab="login">🏠 Početni ekran</button>
                 <button data-admin-tab="system">🛡️ Sistem</button>
             </div>
             <div id="admin-panel"></div>
@@ -1689,6 +1760,181 @@ async function loadAdminData() {
     return usersData.users;
 }
 
+
+let adminLoginSettings = null;
+
+function loginSettingsEditor(settings) {
+    const s = normalizeLoginSettings(settings);
+    return `
+        <div class="login-settings-layout">
+            <form id="login-settings-form" class="login-settings-form">
+                <div class="settings-section">
+                    <h3>START / LOGIN ekran</h3>
+                    <p>Administrator mijenja samo ono što je vidljivo na početnom ekranu.</p>
+                </div>
+                <label>Naslov<input name="title" value="${escapeHtml(s.title)}"></label>
+                <label>Podnaslov<input name="subtitle" value="${escapeHtml(s.subtitle)}"></label>
+                <label>Tekst korisničkog imena<input name="usernameLabel" value="${escapeHtml(s.usernameLabel)}"></label>
+                <label>Placeholder korisničkog imena<input name="usernamePlaceholder" value="${escapeHtml(s.usernamePlaceholder)}"></label>
+                <label>Tekst šifre<input name="passwordLabel" value="${escapeHtml(s.passwordLabel)}"></label>
+                <label>Placeholder šifre<input name="passwordPlaceholder" value="${escapeHtml(s.passwordPlaceholder)}"></label>
+                <label>Tekst dugmeta<input name="primaryButtonText" value="${escapeHtml(s.primaryButtonText)}"></label>
+                <label>Tekst sigurne prijave<input name="secureText" value="${escapeHtml(s.secureText)}"></label>
+                <label>Tekst podnožja<input name="footerText" value="${escapeHtml(s.footerText)}"></label>
+
+                <div class="settings-toggle-grid">
+                    ${[
+                        ["rememberVisible", "Prikaži „Zapamti me“"],
+                        ["rememberDefault", "„Zapamti me“ uključeno"],
+                        ["changeUserVisible", "Prikaži „Promijeni korisnika“"],
+                        ["passwordToggleVisible", "Prikaži 👁 Prikaži/Sakrij šifru"],
+                        ["secureVisible", "Prikaži „Sigurna prijava“"],
+                        ["footerLogoVisible", "Prikaži mali logo u podnožju"],
+                        ["autoLogin", "Automatska prijava ako postoji važeća sesija"],
+                    ].map(([name, label]) => `
+                        <label class="settings-switch">
+                            <input type="checkbox" name="${name}" ${s[name] ? "checked" : ""}>
+                            <span>${escapeHtml(label)}</span>
+                        </label>
+                    `).join("")}
+                </div>
+
+                <div class="settings-colors">
+                    <label>Boja naslova<input type="color" name="titleColor" value="${s.titleColor}"></label>
+                    <label>Boja teksta<input type="color" name="textColor" value="${s.textColor}"></label>
+                    <label>Boja akcenta<input type="color" name="accentColor" value="${s.accentColor}"></label>
+                    <label>Boja pozadine<input type="color" name="backgroundColor" value="${s.backgroundColor}"></label>
+                    <label>Boja kartice<input type="color" name="cardColor" value="${s.cardColor}"></label>
+                </div>
+
+                <label>Logo
+                    <input id="login-logo-file" type="file" accept="image/png,image/jpeg,image/webp">
+                    <small>Logo se automatski smanjuje prije spremanja.</small>
+                </label>
+
+                <div class="settings-actions">
+                    <button type="submit" class="primary-button">Sačuvaj početni ekran</button>
+                    <button type="button" class="secondary-button" id="reset-login-settings">Vrati zadani Super Clean izgled</button>
+                </div>
+            </form>
+
+            <div class="login-settings-preview">
+                <div class="settings-preview-label">LIVE PREVIEW</div>
+                <div id="login-settings-preview"></div>
+            </div>
+        </div>
+    `;
+}
+
+function renderLoginSettingsPreview(settings) {
+    const preview = document.getElementById("login-settings-preview");
+    if (!preview) return;
+    const s = normalizeLoginSettings(settings);
+    preview.innerHTML = `
+        <div class="sc-login-preview" style="--sc-login-title-color:${escapeHtml(s.titleColor)};--sc-login-text-color:${escapeHtml(s.textColor)};--sc-login-accent-color:${escapeHtml(s.accentColor)};--sc-login-background:${escapeHtml(s.backgroundColor)};--sc-login-card:${escapeHtml(s.cardColor)}">
+            <div class="sc-login-preview-card">
+                <img src="${escapeHtml(s.logoSrc)}" alt="">
+                <h4>${escapeHtml(s.title)}</h4>
+                <p>${escapeHtml(s.subtitle)}</p>
+                <div class="preview-field">${escapeHtml(s.usernamePlaceholder)}</div>
+                <div class="preview-field">${escapeHtml(s.passwordPlaceholder)} <span>👁</span></div>
+                <div class="preview-options">${s.rememberVisible ? "☑ Zapamti me" : ""} ${s.changeUserVisible ? "Promijeni korisnika" : ""}</div>
+                <button>${escapeHtml(s.primaryButtonText)}</button>
+                ${s.secureVisible ? `<small>🛡 ${escapeHtml(s.secureText)}</small>` : ""}
+                <footer>${s.footerLogoVisible ? `<img src="${escapeHtml(s.logoSrc)}" alt="">` : ""}${escapeHtml(s.footerText)}</footer>
+            </div>
+        </div>
+    `;
+}
+
+function readLoginSettingsForm(form) {
+    const value = { ...DEFAULT_LOGIN_SETTINGS };
+    for (const name of ["title", "subtitle", "usernameLabel", "usernamePlaceholder", "passwordLabel",
+        "passwordPlaceholder", "primaryButtonText", "secureText", "footerText", "titleColor",
+        "textColor", "accentColor", "backgroundColor", "cardColor"]) {
+        value[name] = form.elements.namedItem(name)?.value ?? value[name];
+    }
+    for (const name of ["rememberVisible", "rememberDefault", "changeUserVisible", "passwordToggleVisible",
+        "secureVisible", "footerLogoVisible", "autoLogin"]) {
+        value[name] = Boolean(form.elements.namedItem(name)?.checked);
+    }
+    return normalizeLoginSettings(value);
+}
+
+function bindLoginSettingsEditor() {
+    const form = document.getElementById("login-settings-form");
+    if (!form) return;
+    const refresh = () => {
+        const value = readLoginSettingsForm(form);
+        if (adminLoginSettings?.logoSrc && value.logoSrc === DEFAULT_LOGIN_SETTINGS.logoSrc) {
+            value.logoSrc = adminLoginSettings.logoSrc;
+        }
+        renderLoginSettingsPreview(value);
+    };
+    form.addEventListener("input", refresh);
+    form.addEventListener("change", async (event) => {
+        if (event.target.id !== "login-logo-file") return;
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const dataUrl = await compressLoginLogo(file);
+        adminLoginSettings = { ...readLoginSettingsForm(form), logoSrc: dataUrl };
+        renderLoginSettingsPreview(adminLoginSettings);
+    });
+    form.addEventListener("submit", saveLoginSettings);
+    document.getElementById("reset-login-settings")?.addEventListener("click", resetLoginSettings);
+    refresh();
+}
+
+async function compressLoginLogo(file) {
+    const source = await createImageBitmap(file);
+    const max = 500;
+    const scale = Math.min(1, max / Math.max(source.width, source.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(source.width * scale));
+    canvas.height = Math.max(1, Math.round(source.height * scale));
+    const context = canvas.getContext("2d");
+    context.drawImage(source, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/webp", 0.82);
+}
+
+async function saveLoginSettings(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const settings = readLoginSettingsForm(form);
+    if (adminLoginSettings?.logoSrc) settings.logoSrc = adminLoginSettings.logoSrc;
+    try {
+        const data = await api("/api/admin/login-settings", {
+            method: "PUT",
+            body: JSON.stringify({ settings }),
+        });
+        adminLoginSettings = normalizeLoginSettings(data.settings);
+        renderLoginSettingsPreview(adminLoginSettings);
+        window.alert("Početni ekran je sačuvan.");
+    } catch (error) {
+        window.alert(error.message);
+    }
+}
+
+async function resetLoginSettings() {
+    if (!window.confirm("Vrati zadani Super Clean izgled početnog ekrana?")) return;
+    try {
+        const data = await api("/api/admin/login-settings/reset", { method: "POST" });
+        adminLoginSettings = normalizeLoginSettings(data.settings);
+        document.getElementById("admin-panel").innerHTML = loginSettingsEditor(adminLoginSettings);
+        bindLoginSettingsEditor();
+    } catch (error) {
+        window.alert(error.message);
+    }
+}
+
+async function loadLoginSettingsAdmin() {
+    const data = await api("/api/admin/login-settings");
+    adminLoginSettings = normalizeLoginSettings(data.settings);
+    const panel = document.getElementById("admin-panel");
+    panel.innerHTML = loginSettingsEditor(adminLoginSettings);
+    bindLoginSettingsEditor();
+}
+
 async function showAdminTab(tab) {
     activeAdminTab = tab;
     clearSelectedRecord();
@@ -1708,6 +1954,8 @@ async function showAdminTab(tab) {
         } else if (tab === "roles") {
             panel.innerHTML = renderRoles();
             bindRoleActions();
+        } else if (tab === "login") {
+            await loadLoginSettingsAdmin();
         } else {
             panel.innerHTML = adminSystemLoadingContent();
             await loadAdminSystem();
@@ -3489,7 +3737,11 @@ async function handleLogin(event) {
     try {
         const data = await api("/api/login", {
             method: "POST",
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({
+                username,
+                password,
+                rememberDevice: document.getElementById("remember-device")?.checked !== false,
+            }),
         });
 
         if (!data?.user) {
@@ -3534,6 +3786,11 @@ async function openPendingQrTarget() {
 }
 
 async function loadSession() {
+    await loadLoginSettings();
+    if (!loginSettings.autoLogin) {
+        loginView();
+        return;
+    }
     try {
         const data = await api("/api/me");
         dashboardView(data.user);

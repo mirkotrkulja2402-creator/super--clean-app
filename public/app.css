@@ -5702,3 +5702,145 @@ body.sc-login-lock {
     overflow: hidden !important;
   }
 }
+
+
+/* Admin login-screen settings */
+.sc-login-screen {
+    background: var(--sc-login-background, #eef8ff);
+}
+.sc-login-card {
+    background: var(--sc-login-card, #fff);
+}
+.sc-login-brand h1 { color: var(--sc-login-title-color, #123b63); }
+.sc-login-brand p,
+.sc-login-field > span,
+.sc-login-secure,
+.sc-login-footer { color: var(--sc-login-text-color, #36516b); }
+.sc-login-submit { background: var(--sc-login-accent-color, #1d6fa8); }
+
+.login-settings-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 440px);
+    gap: 24px;
+    align-items: start;
+}
+.login-settings-form {
+    display: grid;
+    gap: 14px;
+}
+.login-settings-form label {
+    display: grid;
+    gap: 7px;
+    font-weight: 700;
+}
+.login-settings-form input[type="text"],
+.login-settings-form input:not([type]),
+.login-settings-form input[type="color"],
+.login-settings-form input[type="file"] {
+    width: 100%;
+    box-sizing: border-box;
+}
+.settings-section h3 { margin: 0 0 5px; }
+.settings-section p { margin: 0; opacity: .72; }
+.settings-toggle-grid {
+    display: grid;
+    gap: 9px;
+}
+.settings-switch {
+    display: flex !important;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 10px !important;
+}
+.settings-switch input { width: 20px; height: 20px; }
+.settings-colors {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+.settings-colors input[type="color"] {
+    height: 44px;
+    padding: 3px;
+}
+.settings-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.login-settings-preview {
+    position: sticky;
+    top: 16px;
+}
+.settings-preview-label {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    margin-bottom: 8px;
+    opacity: .65;
+}
+.sc-login-preview {
+    background: var(--sc-login-background);
+    border-radius: 24px;
+    padding: 20px;
+    min-height: 600px;
+    display: grid;
+    place-items: center;
+}
+.sc-login-preview-card {
+    width: min(100%, 330px);
+    box-sizing: border-box;
+    padding: 22px;
+    border-radius: 24px;
+    background: var(--sc-login-card);
+    box-shadow: 0 16px 45px rgba(18, 59, 99, .14);
+    color: var(--sc-login-text-color);
+    text-align: center;
+}
+.sc-login-preview-card > img:first-child {
+    width: 112px;
+    height: 112px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+}
+.sc-login-preview-card h4 { margin: 0; color: var(--sc-login-title-color); font-size: 24px; }
+.sc-login-preview-card p { margin: 4px 0 16px; font-size: 12px; }
+.sc-login-preview-card .preview-field {
+    text-align: left;
+    border: 1px solid #d7e3ed;
+    border-radius: 12px;
+    padding: 11px;
+    margin: 8px 0;
+    font-size: 12px;
+}
+.sc-login-preview-card .preview-field span { float: right; }
+.sc-login-preview-card .preview-options { font-size: 10px; margin: 10px 0; }
+.sc-login-preview-card button {
+    width: 100%;
+    border: 0;
+    border-radius: 12px;
+    padding: 12px;
+    background: var(--sc-login-accent-color);
+    color: #fff;
+    font-weight: 800;
+}
+.sc-login-preview-card > small { display: block; margin-top: 10px; }
+.sc-login-preview-card footer {
+    margin-top: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 10px;
+}
+.sc-login-preview-card footer img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    border-radius: 50%;
+}
+@media (max-width: 850px) {
+    .login-settings-layout { grid-template-columns: 1fr; }
+    .login-settings-preview { position: static; }
+}
