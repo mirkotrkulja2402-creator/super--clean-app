@@ -3546,3 +3546,22 @@ async function loadSession() {
 
 
 loadSession();
+
+(function () {
+  function syncLoginViewport() {
+    const login = document.querySelector(
+      '.sc-login-page, .sc-login-screen, .login-page, form[action*="login"]'
+    );
+    document.documentElement.classList.toggle('sc-login-lock', Boolean(login));
+    document.body.classList.toggle('sc-login-lock', Boolean(login));
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', syncLoginViewport, { once: true });
+  } else {
+    syncLoginViewport();
+  }
+  new MutationObserver(syncLoginViewport).observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+})();

@@ -5664,3 +5664,41 @@ body {
         max-height: 220px;
     }
 }
+
+/* START LOGIN: fit the complete login card inside the viewport without vertical scroll. */
+html.sc-login-lock,
+html.sc-login-lock body,
+html.sc-login-lock #app {
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden !important;
+}
+body.sc-login-lock {
+  overscroll-behavior: none;
+}
+.sc-login-page,
+.sc-login-screen,
+.login-page {
+  min-height: 100dvh !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+.sc-login-page > *,
+.sc-login-screen > *,
+.login-page > * {
+  box-sizing: border-box;
+}
+@media (max-width: 600px) {
+  .sc-login-page,
+  .sc-login-screen,
+  .login-page {
+    padding-top: max(8px, env(safe-area-inset-top)) !important;
+    padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
+  }
+  .sc-login-card {
+    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px) !important;
+    overflow: hidden !important;
+  }
+}
